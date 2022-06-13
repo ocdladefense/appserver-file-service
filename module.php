@@ -12,19 +12,23 @@ class FileUploadModule extends Module
 		parent::__construct();
 	}
 
-	public function showForm() {
+	public function showForm($sObjectId) {
+
+		//$sObjectId = "a2C05000000qFiyEAE";
 
 		$tpl = new Template("upload");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render();
+		return $tpl->render(["sObjectId" => $sObjectId]);
 	}
 
 
 	public function upload() {
 
+		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
+
 		$file = $this->getRequest()->getFiles()->getFirst();
-		$linkedEntityId = "a2C05000000qFiyEAE";
+
 		$contentDocumentId = "069050000025IaUAAU";
 
 		$contentDocumentLinkId = $this->uploadContentDocument($linkedEntityId, $contentDocumentId, $file);

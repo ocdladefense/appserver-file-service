@@ -5,7 +5,7 @@
 	"connectedApp": "default",
 	"files": [],
 	"routes": {
-		"file/upload/form": {
+		"file/upload/form/%sObjectId": {
 			"callback":"showForm",
 			"content-type":"text/html"
 		},

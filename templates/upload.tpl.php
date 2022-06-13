@@ -5,6 +5,8 @@
 <div class="container">
 	<form method="post" action="/file/upload" enctype="multipart/form-data">
 
+		<input type="hidden" name="sObjectId" value="<?php print $sObjectId; ?>">
+
 		<div class="form-item">
 			<div>
 				<input type="file" id="Attachments__c[]" name="Attachments__c[]" />
