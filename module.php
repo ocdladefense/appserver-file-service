@@ -29,6 +29,7 @@ class FileUploadModule extends Module
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 
+		// if you are updating an existing content document, you will have to query for it here.
 		$contentDocumentId = "069050000025IaUAAU";
 
 		$contentDocumentLinkId = $this->uploadContentDocument($linkedEntityId, $contentDocumentId, $file);
