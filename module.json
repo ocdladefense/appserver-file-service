@@ -1,0 +1,17 @@
+{
+	"comment": "Module definition file.",
+	"name": "file-upload",
+	"description": "Upload files as attachments for sObjects.",
+	"connectedApp": "default",
+	"files": [],
+	"routes": {
+		"file/upload/form": {
+			"callback":"showForm",
+			"content-type":"text/html"
+		},
+		"file/upload": {
+			"callback":"upload",
+			"content-type":"text/html"
+		}
+	}
+}
