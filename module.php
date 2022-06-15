@@ -16,16 +16,25 @@ class FileUploadModule extends Module
 
 	public function showForm($sObjectId) {
 
+		$committeeIdsA = ["1","2","3"];
+		$committeeIdsB = ["4","5","6"];
+
 		$tpl = new Template("upload");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["sObjectId" => $sObjectId]);
+		return $tpl->render([
+			"sObjectId" => $sObjectId,
+			"comA"		=> implode(",", $committeeIdsA),
+			"comB"		=> implode(",", $committeeIdsB)
+		]);
 	}
 
 
 	public function upload(){
 
 		//$contentDocumentId = "069050000025IaUAAU";
+
+		var_dump($this->getRequest()->getBody());exit;
 
 		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
 
@@ -47,23 +56,33 @@ class FileUploadModule extends Module
 			$resp = $api->uploadFile($doc);
 
 		} else {
-			
-			$doc->setLinkedEntityId($linkedEntityId);
 
 			$resp = $api->uploadFile($doc);
 			$contentVersionId = $resp->getBody()["id"];
 
+			$api = $this->loadForceApiFromFlow("usernamepassword");
 			// Get the ContentDocumentId from the ContentVersion.
 			$resp = $api->query("SELECT ContentDocumentId FROM ContentVersion WHERE Id = '{$contentVersionId}'");
 			$contentDocumentId = $resp->getRecords()[0]["ContentDocumentId"];
 
-			// Watch out for duplicates on the link object, because you dont have an Id field!
-			$contentDocumentLink = new StdClass();
-			$contentDocumentLink->contentDocumentId = $contentDocumentId;
-			$contentDocumentLink->linkedEntityId = $doc->getLinkedEntityId();
-			$contentDocumentLink->visibility = "AllUsers";
+			//$doc->setLinkedEntityId($linkedEntityId);
 
-			$resp = $api->upsert("ContentDocumentLink", $contentDocumentLink);
+			$sobjects = ["a2C05000000qFiyEAE", "003j000000rU9NvAAK"];
+
+			foreach($sobjects as $s) {
+
+				$doc->setLinkedEntityId($s);
+
+				$api = $this->loadForceApiFromFlow("usernamepassword");
+
+				// Watch out for duplicates on the link object, because you dont have an Id field!
+				$contentDocumentLink = new StdClass();
+				$contentDocumentLink->contentDocumentId = $contentDocumentId;
+				$contentDocumentLink->linkedEntityId = $doc->getLinkedEntityId();
+				$contentDocumentLink->visibility = "AllUsers";
+
+				$resp = $api->upsert("ContentDocumentLink", $contentDocumentLink);
+			}
 		}
 
 		if(!$resp->isSuccess()){
