@@ -8,9 +8,7 @@
 		<input type="hidden" name="sObjectId" value="<?php print $sObjectId; ?>">
 
 		<div class="form-item">
-			<div>
-				<input type="file" id="Attachments__c[]" name="Attachments__c[]" />
-			</div>
+			<input type="file" id="Attachments__c[]" name="Attachments__c[]" />
 		</div>
 
 		<div class="form-item">

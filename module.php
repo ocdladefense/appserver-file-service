@@ -2,6 +2,7 @@
 
 use File\File;
 use Salesforce\ContentDocument;
+use Http\HttpRequest;
 
 
 class FileUploadModule extends Module
@@ -12,9 +13,8 @@ class FileUploadModule extends Module
 		parent::__construct();
 	}
 
-	public function showForm($sObjectId) {
 
-		//$sObjectId = "a2C05000000qFiyEAE";
+	public function showForm($sObjectId) {
 
 		$tpl = new Template("upload");
 		$tpl->addPath(__DIR__ . "/templates");
@@ -23,7 +23,91 @@ class FileUploadModule extends Module
 	}
 
 
-	public function upload() {
+	public function upload(){
+
+		//$contentDocumentId = "069050000025IaUAAU";
+
+		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
+
+		$file = $this->getRequest()->getFiles()->getFirst();
+
+		$api = $this->loadForceApiFromFlow("usernamepassword");
+
+		// Are you updating an existing ContentDocument or creating a new one?
+		$isUpdate = !empty($contentDocumentId);
+
+		$doc = ContentDocument::fromFile($file);
+
+
+		if($isUpdate) {
+
+			$doc->setContentDocumentId($contentDocumentId);
+
+			// The "uploadFile" function returns the id field of the new ContentVersion.
+			$resp = $api->uploadFile($doc);
+
+		} else {
+			
+			$doc->setLinkedEntityId($linkedEntityId);
+
+			$resp = $api->uploadFile($doc);
+			$contentVersionId = $resp->getBody()["id"];
+
+			// Get the ContentDocumentId from the ContentVersion.
+			$resp = $api->query("SELECT ContentDocumentId FROM ContentVersion WHERE Id = '{$contentVersionId}'");
+			$contentDocumentId = $resp->getRecords()[0]["ContentDocumentId"];
+
+			// Watch out for duplicates on the link object, because you dont have an Id field!
+			$contentDocumentLink = new StdClass();
+			$contentDocumentLink->contentDocumentId = $contentDocumentId;
+			$contentDocumentLink->linkedEntityId = $doc->getLinkedEntityId();
+			$contentDocumentLink->visibility = "AllUsers";
+
+			$resp = $api->upsert("ContentDocumentLink", $contentDocumentLink);
+		}
+
+		if(!$resp->isSuccess()){
+
+			$message = $resp->getErrorMessage();
+			throw new Exception($message);
+		}
+
+		// if the response is the result of an update, the id returned is that of the new ContentVersion.
+		// if the response is the result of creating a new ContentDocument the id returned is that of the new ContentDocuemntLink. 
+		$id = $resp->getBody()["id"];
+
+		return "File uploaded successfuly";
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public function uploadOld() {
 
 		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
 
@@ -32,14 +116,19 @@ class FileUploadModule extends Module
 		// if you are updating an existing content document, you will have to query for it here.
 		$contentDocumentId = "069050000025IaUAAU";
 
-		$contentDocumentLinkId = $this->uploadContentDocument($linkedEntityId, $contentDocumentId, $file);
+		$contentDocumentLinkId = $this->uploadContentDocument($linkedEntityId, $file, $contentDocumentId);
 
 		return "Your file has been uploaded!";
 	}
 
 
+
+
+
+
+
 	// $linkedEntityId = the sObject that the contentdocument will be associated with.
-	public function uploadContentDocument($linkedEntityId, $contentDocumentId, $file) {
+	public function uploadContentDocument($linkedEntityId, $file, $contentDocumentId = null) {
 
 		$title = $file->getName();
 
@@ -113,24 +202,5 @@ class FileUploadModule extends Module
 		}
 
 		return $resp->getBody()["id"];
-	}
-
-	public function downloadContentDocument($id){
-
-		$api = $this->loadForceApi();
-
-		$veriondataQuery = "SELECT Versiondata, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = true";
-
-		$contentVersion = $api->query($veriondataQuery)->getRecord();
-		$versionData = $contentVersion["VersionData"];
-
-		$api2 = $this->loadForceApi();
-		$resp = $api2->send($versionData);
-
-		$file = new File($contentVersion["Title"]);
-		$file->setContent($resp->getBody());
-		$file->setType($resp->getHeader("Content-Type"));
-
-		return $file;
 	}
 }
