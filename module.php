@@ -14,25 +14,28 @@ class FileUploadModule extends Module
 	}
 
 
-	public function showForm($sObjectId) {
+	public function showForm($sObjectId = null) {
 
-		$committeeIdsA = ["1","2","3"];
-		$committeeIdsB = ["4","5","6"];
+		$accountName = "OCDLA";
+
+		$sharing = array(
+			"123abc" 		=> "Others in {$accountName}",
+			"1234abcd"		=> "Web Governance Committee",
+			"1234abcde"		=> "Board of Directors"
+		);
 
 		$tpl = new Template("upload");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render([
-			"sObjectId" => $sObjectId,
-			"comA"		=> implode(",", $committeeIdsA),
-			"comB"		=> implode(",", $committeeIdsB)
+			"sharing"		=> $sharing
 		]);
 	}
 
 
 	public function upload(){
 
-		//$contentDocumentId = "069050000025IaUAAU";
+		
 
 		var_dump($this->getRequest()->getBody());exit;
 
@@ -65,11 +68,11 @@ class FileUploadModule extends Module
 			$resp = $api->query("SELECT ContentDocumentId FROM ContentVersion WHERE Id = '{$contentVersionId}'");
 			$contentDocumentId = $resp->getRecords()[0]["ContentDocumentId"];
 
-			//$doc->setLinkedEntityId($linkedEntityId);
+			
 
-			$sobjects = ["a2C05000000qFiyEAE", "003j000000rU9NvAAK"];
+			
 
-			foreach($sobjects as $s) {
+			foreach(array_keys($sharing) as $id) {
 
 				$doc->setLinkedEntityId($s);
 

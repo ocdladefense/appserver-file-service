@@ -1,17 +1,23 @@
+<?php
+/*
+$sharing = array();
+*/
 
+?>
 
 <h2>OCDLA: Upload a File</h2>
 
-<div class="container">
-	<form method="post" action="/file/upload" enctype="multipart/form-data">
 
-		<label>Share With Committee A</label>
-		<input name="linked-entity-id[]" type="checkbox" value="<?php print $comA; ?>" />
+<form method="post" action="/file/upload" enctype="multipart/form-data">
+	<div class="container">
 
-		<label>Share With Committee B</label>
-		<input name="linked-entity-id[]" type="checkbox" value="<?php print $comB; ?>" />
+		<?php foreach($sharing as $objectId => $label): ?>
+			<div class="form-item">
+				<label><?php print $label; ?></label>
+				<input name="linked-entity-id[]" type="checkbox" value="<?php print $objectId; ?>" />
+			</div>
+		<?php endforeach; ?>
 
-		<input type="hidden" name="sObjectId" value="<?php print $sObjectId; ?>" />
 
 		<div class="form-item">
 			<input type="file" id="Attachments__c[]" name="Attachments__c[]" />
@@ -21,8 +27,9 @@
 			<input type="submit" value="Upload File" />
 		</div>
 
-	</form>
-</div>
+	</div>
+</form>
+
 
 
 
