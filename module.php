@@ -14,9 +14,45 @@ class FileUploadModule extends Module
 	}
 
 
-	public function showForm($sObjectId = null) {
+	public function showForm() {
+
+		$api = $this->loadForceApi();
+
+		$contactId = "003j000000rU9NvAAK";// Jose's contact id
+
+		// Get the account name
+		$accountNameQuery = "SELECT account.name from contact where id = '$contactId'";
+		$accountName = $api->query($accountNameQuery)->getRecord()["Account"]["Name"];
+
+
+		// Get the board members
+		$boardMembersQuery = "SELECT Id from contact where Ocdla_Is_Board_Member__c = true";
+		$result = $api->query($boardMembersQuery);
+
+		$boardMemberContactIds = [];
+		foreach($result->getRecords() as $member) $boardMemberContactIds[] = $member["Id"];
+
+
+		// Get the ids of all of the members of all of the committees that the current user is a member of.
+		$userCommitteesQuery = "SELECT Committee__c FROM Relationship__c WHERE Contact__c = '$contactId'";
+		$committees = $api->query($userCommitteesQuery)->getRecords();
+
+		$committeeIds = [];
+		foreach($committees as $c) $committeeIds[] = $c["Committee__c"];
+
+		$committeeIdString = "('" . implode("','", $committeeIds) . "')";
+
+		$committeeMembers = "SELECT Contact__c FROM Relationship__c WHERE (Committee__c IN $committeeIdString)";
+
+		$result = $api->query($committeeMembers);
+		$committeeMemberIds = [];
+		foreach($result->getRecords() as $comMember) $committeeMemberIds[] = $comMember["Contact__c"];
+
+		var_dump($accountName, $boardMemberContactIds, $committeeMemberIds);exit;
+
 
 		$accountName = "OCDLA";
+
 
 		$sharing = array(
 			"123abc" 		=> "Others in {$accountName}",
@@ -34,8 +70,6 @@ class FileUploadModule extends Module
 
 
 	public function upload(){
-
-		
 
 		var_dump($this->getRequest()->getBody());exit;
 
