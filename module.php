@@ -18,7 +18,52 @@ class FileUploadModule extends Module
 
 		$api = $this->loadForceApi();
 
-		$contactId = "003j000000rU9NvAAK";// Jose's contact id
+		$user = current_user();
+
+		$sharing = array();
+
+		$accountId = $user->query("Contact.AccountId");
+		$accountName = $user->query("Account.Name");
+		$contactId = $user->getContactId();
+
+		// var_dump($accountId, $accountName, $contactId);exit;
+		// Okay let's figure out how we get the ContactId from the session and how we get the user from the session.
+
+		// $contactId = "003j000000rU9NvAAK"; // Jose's contact id
+
+		$format = "SELECT Committee__c, Committee__r.Name FROM Relationship__c WHERE Contact__c = '%s'";
+
+		$query = sprintf($format, $contactId);
+
+		$result = $api->query($query);
+
+		$records = $result->getRecords();
+
+
+
+		if(null != $accountId) {
+			$sharing[$accountId] = "Others in {$accountName}";
+		}
+
+
+		foreach($records as $rel) {
+			$key 			= $rel["Committee__c"];
+			$name 			= $rel["Committee__r"]["Name"];
+			$sharing[$key] 	= $name;
+		}
+
+		$tpl = new Template("upload");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render([
+			"sharing"		=> $sharing
+		]);
+	}
+
+
+
+	public function doQuery() {
+
 
 		// Get the account name
 		$accountNameQuery = "SELECT account.name from contact where id = '$contactId'";
@@ -49,24 +94,8 @@ class FileUploadModule extends Module
 		foreach($result->getRecords() as $comMember) $committeeMemberIds[] = $comMember["Contact__c"];
 
 		var_dump($accountName, $boardMemberContactIds, $committeeMemberIds);exit;
-
-
-		$accountName = "OCDLA";
-
-
-		$sharing = array(
-			"123abc" 		=> "Others in {$accountName}",
-			"1234abcd"		=> "Web Governance Committee",
-			"1234abcde"		=> "Board of Directors"
-		);
-
-		$tpl = new Template("upload");
-		$tpl->addPath(__DIR__ . "/templates");
-
-		return $tpl->render([
-			"sharing"		=> $sharing
-		]);
 	}
+
 
 
 	public function upload(){
