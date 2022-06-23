@@ -1,4 +1,4 @@
-<h1>Here are the documents that have been shared with you!</h1>
+<h1>Available Documents</h1>
 
 <br />
 <br />
@@ -7,7 +7,7 @@
 <div>
     <div class="row first">
         <p class="col">Title</p>
-        <p class="col">MimeType</p>
+        <p class="col">Type</p>
         <p class="col">Size</p>
     </div>
 </div>
