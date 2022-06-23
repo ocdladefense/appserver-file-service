@@ -3,6 +3,7 @@
 use File\File;
 use Salesforce\ContentDocument;
 use Http\HttpRequest;
+use Mysql\DbHelper;
 
 
 class FileUploadModule extends Module
@@ -26,11 +27,6 @@ class FileUploadModule extends Module
 		$accountName = $user->query("Account.Name");
 		$contactId = $user->getContactId();
 
-		// var_dump($accountId, $accountName, $contactId);exit;
-		// Okay let's figure out how we get the ContactId from the session and how we get the user from the session.
-
-		// $contactId = "003j000000rU9NvAAK"; // Jose's contact id
-
 		$format = "SELECT Committee__c, Committee__r.Name FROM Relationship__c WHERE Contact__c = '%s'";
 
 		$query = sprintf($format, $contactId);
@@ -39,6 +35,9 @@ class FileUploadModule extends Module
 
 		$records = $result->getRecords();
 
+
+		// Always share with the original contactId
+		// a new route that shows all of the contentDocumentLinks of docs that are shared with the current user.
 
 
 		if(null != $accountId) {
@@ -62,45 +61,8 @@ class FileUploadModule extends Module
 
 
 
-	public function doQuery() {
-
-
-		// Get the account name
-		$accountNameQuery = "SELECT account.name from contact where id = '$contactId'";
-		$accountName = $api->query($accountNameQuery)->getRecord()["Account"]["Name"];
-
-
-		// Get the board members
-		$boardMembersQuery = "SELECT Id from contact where Ocdla_Is_Board_Member__c = true";
-		$result = $api->query($boardMembersQuery);
-
-		$boardMemberContactIds = [];
-		foreach($result->getRecords() as $member) $boardMemberContactIds[] = $member["Id"];
-
-
-		// Get the ids of all of the members of all of the committees that the current user is a member of.
-		$userCommitteesQuery = "SELECT Committee__c FROM Relationship__c WHERE Contact__c = '$contactId'";
-		$committees = $api->query($userCommitteesQuery)->getRecords();
-
-		$committeeIds = [];
-		foreach($committees as $c) $committeeIds[] = $c["Committee__c"];
-
-		$committeeIdString = "('" . implode("','", $committeeIds) . "')";
-
-		$committeeMembers = "SELECT Contact__c FROM Relationship__c WHERE (Committee__c IN $committeeIdString)";
-
-		$result = $api->query($committeeMembers);
-		$committeeMemberIds = [];
-		foreach($result->getRecords() as $comMember) $committeeMemberIds[] = $comMember["Contact__c"];
-
-		var_dump($accountName, $boardMemberContactIds, $committeeMemberIds);exit;
-	}
-
-
 
 	public function upload(){
-
-		var_dump($this->getRequest()->getBody());exit;
 
 		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
 
@@ -164,6 +126,46 @@ class FileUploadModule extends Module
 		return "File uploaded successfuly";
 	}
 
+
+	public function showAll() {
+
+		$user = current_user();
+		$contactId = $user->getContactId();
+		$accountId = $user->query("Contact.AccountId");
+
+		// Get the committee ids
+		$api = $this->loadForceApi();
+		$query = "SELECT Committee__c FROM Relationship__c WHERE Contact__c = '$contactId'";
+
+		$committeeIds = $api->query($query)->getField("Committee__c");
+
+		$linkedEntityIds = array_merge([$contactId, $accountId], $committeeIds);
+
+		$query = "SELECT ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
+		$query = DbHelper::parseArray($query, $linkedEntityIds);
+
+		$resp = $api->query($query);
+
+		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
+
+		$links = $resp->getRecords();
+		$tpl = new Template("document-list");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render(["links" => $links]);
+	}
+
+
+
+
+	public function groupDocuments() {
+
+		$sobjPrefix = [
+			"003" => "Contact",
+			"001" => "Account",
+			"a2G" => "Committee"
+		];
+	}
 
 
 

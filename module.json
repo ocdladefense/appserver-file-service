@@ -4,6 +4,20 @@
 	"description": "Upload files as attachments for sObjects.",
 	"connectedApp": "default",
 	"files": [],
+	"links":[
+		{
+        "href":"/file/upload/form",
+        "label": "Upload Files",
+        "isSublink": false,
+        "adminLink": false
+		},
+		{
+		"href":"/file/list",
+		"label": "My Shared Files",
+		"isSublink": false,
+		"adminLink": false
+		}
+	],
 	"routes": {
 		"file/upload/form": {
 			"callback":"showForm",
@@ -12,6 +26,11 @@
 		"file/upload": {
 			"callback":"upload",
 			"content-type":"text/html"
+		},
+		"file/list": {
+			"callback":"showAll",
+			"content-type":"text/html"
 		}
+
 	}
 }
