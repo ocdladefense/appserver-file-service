@@ -55,7 +55,8 @@ class FileUploadModule extends Module
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render([
-			"sharing"		=> $sharing
+			"sharing"		=> $sharing,
+			"contactId"		=> $contactId
 		]);
 	}
 
@@ -64,7 +65,7 @@ class FileUploadModule extends Module
 
 	public function upload(){
 
-		$linkedEntityId = $this->getRequest()->getBody()->sObjectId;
+		$linkedEntityIds = $this->getRequest()->getBody()->linkedEntityIds;
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 
@@ -94,12 +95,9 @@ class FileUploadModule extends Module
 			$contentDocumentId = $resp->getRecords()[0]["ContentDocumentId"];
 
 			
+			foreach($linkedEntityIds as $id) {
 
-			
-
-			foreach(array_keys($sharing) as $id) {
-
-				$doc->setLinkedEntityId($s);
+				$doc->setLinkedEntityId($id);
 
 				$api = $this->loadForceApiFromFlow("usernamepassword");
 
@@ -123,7 +121,7 @@ class FileUploadModule extends Module
 		// if the response is the result of creating a new ContentDocument the id returned is that of the new ContentDocuemntLink. 
 		$id = $resp->getBody()["id"];
 
-		return "File uploaded successfuly";
+		return redirect("/file/list");
 	}
 
 
@@ -141,7 +139,7 @@ class FileUploadModule extends Module
 
 		$linkedEntityIds = array_merge([$contactId, $accountId], $committeeIds);
 
-		$query = "SELECT ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
+		$query = "SELECT ContentDocumentId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
 		$query = DbHelper::parseArray($query, $linkedEntityIds);
 
 		$resp = $api->query($query);
@@ -149,6 +147,7 @@ class FileUploadModule extends Module
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
 
 		$links = $resp->getRecords();
+
 		$tpl = new Template("document-list");
 		$tpl->addPath(__DIR__ . "/templates");
 
@@ -156,6 +155,25 @@ class FileUploadModule extends Module
 	}
 
 
+
+	public function downloadContentDocument($id){
+
+		$api = $this->loadForceApi();
+
+		$veriondataQuery = "SELECT Versiondata, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = true";
+
+		$contentVersion = $api->query($veriondataQuery)->getRecord();
+		$versionData = $contentVersion["VersionData"];
+
+		$api2 = $this->loadForceApi();
+		$resp = $api2->send($versionData);
+
+		$file = new File($contentVersion["Title"]);
+		$file->setContent($resp->getBody());
+		$file->setType($resp->getHeader("Content-Type"));
+
+		return $file;
+	}
 
 
 	public function groupDocuments() {

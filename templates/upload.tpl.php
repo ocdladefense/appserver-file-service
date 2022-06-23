@@ -8,15 +8,17 @@ $sharing = array();
 <h2>OCDLA: Upload a File</h2>
 
 
-<form method="post" action="/file/upload" enctype="multipart/form-data">
+<form method="post" action="/file/upload/file" enctype="multipart/form-data">
 	<div class="container">
 
 		<?php foreach($sharing as $objectId => $label): ?>
 			<div class="form-item">
 				<label><?php print $label; ?></label>
-				<input name="linked-entity-id[]" type="checkbox" value="<?php print $objectId; ?>" />
+				<input name="linkedEntityIds[]" type="checkbox" value="<?php print $objectId; ?>" />
 			</div>
 		<?php endforeach; ?>
+
+		<input type="hidden" name="linkedEntityIds[]" value="<?php print $contactId; ?>" />
 
 
 		<div class="form-item">

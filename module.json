@@ -6,7 +6,7 @@
 	"files": [],
 	"links":[
 		{
-        "href":"/file/upload/form",
+        "href":"/file/upload",
         "label": "Upload Files",
         "isSublink": false,
         "adminLink": false
@@ -19,16 +19,20 @@
 		}
 	],
 	"routes": {
-		"file/upload/form": {
+		"file/upload": {
 			"callback":"showForm",
 			"content-type":"text/html"
 		},
-		"file/upload": {
+		"file/upload/file": {
 			"callback":"upload",
 			"content-type":"text/html"
 		},
 		"file/list": {
 			"callback":"showAll",
+			"content-type":"text/html"
+		},
+		"file/download/%id": {
+			"callback":"downloadContentDocument",
 			"content-type":"text/html"
 		}
 
