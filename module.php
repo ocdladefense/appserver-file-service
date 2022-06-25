@@ -122,13 +122,13 @@ class FileUploadModule extends Module
 
 
 
-	public function showAll() {
+	public function list($list = null) {
 
 		$user = current_user();
 		$contactId = $user->getContactId();
 		$accountId = $user->query("Contact.AccountId");
 
-		// Get the committee ids
+		// Get the Committee Ids.
 		$api = $this->loadForceApi();
 		$query = "SELECT Committee__c FROM Relationship__c WHERE Contact__c = '$contactId'";
 
@@ -145,7 +145,7 @@ class FileUploadModule extends Module
 
 		$links = $resp->getRecords();
 
-		$tpl = new Template("document-list");
+		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render(["links" => $links]);
@@ -157,7 +157,7 @@ class FileUploadModule extends Module
 
 		$api = $this->loadForceApi();
 
-		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = true";
+		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = True";
 
 		$version = $api->query($query)->getRecord();
 		$versionUrl = $version["VersionData"];
@@ -171,6 +171,160 @@ class FileUploadModule extends Module
 
 		return $file;
 	}
+
+	
+	public function getAttachment($id) {
+
+		// Get the attachment object.
+		$api = $this->loadForceApi();
+		$results = $api->query("SELECT Id, Name, Body FROM Attachment WHERE Id = '{$id}'");
+		$attachment = $results->getRecord();
+
+		// Request the file content of the attachment using the blobfield endpoint returned in the "Body" field of the attachment.
+		$endpoint = $attachment["Body"];
+		$req = $this->loadForceApi();
+		$req->removeXHttpClientHeader();
+		$resp = $req->send($endpoint);
+
+		$file = new File($attachment["Name"]);
+		$file->setContent($resp->getBody());
+		$file->setType($resp->getHeader("Content-Type"));
+
+		return $file;
+	}
+
+
+
+
+	/**
+	 * Used by the appserver-jobs module.
+	 * 
+	 * Given a list of record ids, get the related ContentDocumentLink records.
+	 */
+	public function getContentDocument($jobRecords){
+
+		// Get the job ids as a comma seperated string.
+		$jobIds = array();
+		foreach($jobRecords as $job){
+
+			$jobIds[] = $job["Id"];
+		}
+
+		$links = $this->getContentDocumentLinks($jobIds);
+
+		$contentVersions = $this->getContentDocumentIds($links);
+
+
+		// Add the contentVersion to the job array at the index of "ContentDocument" if there is a contentversion.
+		$updatedJobRecords = array();
+		foreach($jobRecords as $job){
+
+			foreach($links as $link){
+
+				if($link["LinkedEntityId"] == $job["Id"]){
+
+					foreach($contentVersions as $conDoc){
+
+						// This is a cheat. 
+						$conDoc["Id"] = $conDoc["ContentDocumentId"];
+
+						if($conDoc["ContentDocumentId"] == $link["ContentDocumentId"]){
+
+							$job["ContentDocument"] = $conDoc;
+
+						}
+					}
+				}
+			}
+
+			$updatedJobRecords[] = $job;
+		}
+
+		return $updatedJobRecords;
+	}
+
+	/**
+	 * Used by the appserver-jobs module.
+	 * 
+	 * Given a list of record ids, get the related ContentDocumentLink records.
+	 */
+	public function getContentDocumentLinks($jobIds){
+
+		$jobIdString = "'" . implode("','", $jobIds) . "'";
+
+
+		$api = $this->loadForceApi();
+		$query = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN ($jobIdString)";
+		$resp = $api->query($query);
+
+		if(!$resp->isSuccess()) throw new Exception($resp->getErrorMessage());
+
+		return $resp->getRecords();
+	}
+
+	/**
+	 * Used by the appserver-jobs module.
+	 * 
+	 * Given a list of record ids, get the related ContentDocumentLink records.
+	 */
+	public function getContentDocumentIds($links){
+
+		$contentDocumentIds = array();
+		foreach($links as $link){
+
+			$contentDocumentIds[] = $link["ContentDocumentId"];
+		}
+
+		$conDocIdString = "'" . implode("','", $contentDocumentIds) . "'";
+
+
+		// Get the contentVersions
+		$api = $this->loadForceApi();
+		$query = "SELECT Id, Title, isLatest, ContentDocumentId FROM ContentVersion WHERE contentDocumentId IN ($conDocIdString) AND IsLatest = true";
+		$resp = $api->query($query);
+
+		if(!$resp->isSuccess()) throw new Exception($resp->getErrorMessage());
+
+		return $resp->getRecords();
+	}
+
+
+
+/////////////////////////	ATTACHMENT STUFF	////////////////////////////////////////////////////////////////////////
+
+		// Get the FileList" object from the request, use the first file to build an "Attachment/File" object,
+	// insert the Attachment, and return the id.
+	public function insertAttachment($jobId, $file){
+
+		if($jobId == null) throw new Exception("ERROR_ADDING_ATTACHMENT:  The job id can not be null when adding attachments.");
+
+		$fileClass = "Salesforce\Attachment";
+
+		$file = $fileClass::fromFile($file);
+		$file->setParentId($jobId);
+
+		$api = $this->loadForceApi();
+
+		$resp = $api->uploadFile($file);
+
+		if(!$resp->isSuccess()) throw new Exception($resp->getErrorMessage());
+
+		$attachment = $fileClass::fromArray($resp->getBody());
+
+		return $attachment->Id;
+	}
+
+
+
+	public function getAttachments($jobId) {
+
+		$api = $this->loadForceApi();
+		
+		$attResults = $api->query("SELECT Id, Name FROM Attachment WHERE ParentId = '{$jobId}'");
+
+		return $attResults->getRecords();
+	}
+
 
 
 
