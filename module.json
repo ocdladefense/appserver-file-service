@@ -1,21 +1,18 @@
 {
 	"comment": "Module definition file.",
 	"name": "file-upload",
+	"name2": "file-service",
 	"description": "Upload files as attachments for sObjects.",
 	"connectedApp": "default",
-	"files": [],
+	"files": ["FileService.php"],
 	"links":[
 		{
-        "href":"/file/upload",
-        "label": "Upload Files",
-        "isSublink": false,
-        "adminLink": false
+        	"href":"/file/upload",
+        	"label": "Upload Files"
 		},
 		{
-		"href":"/file/list",
-		"label": "My Shared Files",
-		"isSublink": false,
-		"adminLink": false
+			"href":"/file/list",
+			"label": "My Shared Files"
 		}
 	],
 	"routes": {
@@ -28,13 +25,20 @@
 			"content-type":"text/html"
 		},
 		"file/list": {
-			"callback":"showAll",
+			"callback":"list",
+			"content-type":"text/html"
+		},
+		"file/list/%listName": {
+			"callback":"list",
 			"content-type":"text/html"
 		},
 		"file/download/%id": {
 			"callback":"downloadContentDocument",
 			"content-type":"text/html"
+		},
+		"attachment/%id":{
+			"callback": "getAttachment",
+			"content-type": "application/base64"
 		}
-
 	}
 }
