@@ -6,7 +6,7 @@ use Http\HttpRequest;
 use Mysql\DbHelper;
 
 
-class FileUploadModule extends Module
+class FileSerivceModule extends Module
 {
 
 	public function __construct() {
@@ -18,7 +18,7 @@ class FileUploadModule extends Module
 
 	public function showForm() {
 
-		$api = $this->loadForceApi();
+		$api = loadApi(); // global 
 
 		$user = current_user();
 
@@ -65,7 +65,7 @@ class FileUploadModule extends Module
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 
-		$api = $this->loadForceApiFromFlow("usernamepassword");
+		$api = loadApi();
 
 		// Are you updating an existing ContentDocument or creating a new one?
 		$isUpdate = !empty($contentDocumentId);
@@ -85,7 +85,7 @@ class FileUploadModule extends Module
 			$resp = $api->uploadFile($doc);
 			$contentVersionId = $resp->getBody()["id"];
 
-			$api = $this->loadForceApiFromFlow("usernamepassword");
+			$api = loadApi();
 			// Get the ContentDocumentId from the ContentVersion.
 			$resp = $api->query("SELECT ContentDocumentId FROM ContentVersion WHERE Id = '{$contentVersionId}'");
 			$contentDocumentId = $resp->getRecords()[0]["ContentDocumentId"];
@@ -95,7 +95,7 @@ class FileUploadModule extends Module
 
 				$doc->setLinkedEntityId($id);
 
-				$api = $this->loadForceApiFromFlow("usernamepassword");
+				$api = loadApi();
 
 				// Watch out for duplicates on the link object, because you dont have an Id field!
 				$contentDocumentLink = new StdClass();
@@ -129,7 +129,7 @@ class FileUploadModule extends Module
 		$accountId = $user->query("Contact.AccountId");
 
 		// Get the Committee Ids.
-		$api = $this->loadForceApi();
+		$api = loadApi();
 		$query = "SELECT Committee__c FROM Relationship__c WHERE Contact__c = '$contactId'";
 
 		$committeeIds = $api->query($query)->getField("Committee__c");
@@ -155,14 +155,14 @@ class FileUploadModule extends Module
 
 	public function downloadContentDocument($id){
 
-		$api = $this->loadForceApi();
+		$api = loadApi();
 
 		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = True";
 
 		$version = $api->query($query)->getRecord();
 		$versionUrl = $version["VersionData"];
 
-		$api2 = $this->loadForceApi();
+		$api2 = loadApi();
 		$resp = $api2->send($versionUrl);
 
 		$file = new File($version["Title"]);
@@ -176,13 +176,13 @@ class FileUploadModule extends Module
 	public function getAttachment($id) {
 
 		// Get the attachment object.
-		$api = $this->loadForceApi();
+		$api = loadApi();
 		$results = $api->query("SELECT Id, Name, Body FROM Attachment WHERE Id = '{$id}'");
 		$attachment = $results->getRecord();
 
 		// Request the file content of the attachment using the blobfield endpoint returned in the "Body" field of the attachment.
 		$endpoint = $attachment["Body"];
-		$req = $this->loadForceApi();
+		$req = loadApi();
 		$req->removeXHttpClientHeader();
 		$resp = $req->send($endpoint);
 
@@ -253,7 +253,7 @@ class FileUploadModule extends Module
 		$jobIdString = "'" . implode("','", $jobIds) . "'";
 
 
-		$api = $this->loadForceApi();
+		$api = loadApi();
 		$query = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN ($jobIdString)";
 		$resp = $api->query($query);
 
@@ -279,7 +279,7 @@ class FileUploadModule extends Module
 
 
 		// Get the contentVersions
-		$api = $this->loadForceApi();
+		$api = loadApi();
 		$query = "SELECT Id, Title, isLatest, ContentDocumentId FROM ContentVersion WHERE contentDocumentId IN ($conDocIdString) AND IsLatest = true";
 		$resp = $api->query($query);
 
@@ -303,7 +303,7 @@ class FileUploadModule extends Module
 		$file = $fileClass::fromFile($file);
 		$file->setParentId($jobId);
 
-		$api = $this->loadForceApi();
+		$api = loadApi();
 
 		$resp = $api->uploadFile($file);
 
@@ -318,7 +318,7 @@ class FileUploadModule extends Module
 
 	public function getAttachments($jobId) {
 
-		$api = $this->loadForceApi();
+		$api = loadApi();
 		
 		$attResults = $api->query("SELECT Id, Name FROM Attachment WHERE ParentId = '{$jobId}'");
 
