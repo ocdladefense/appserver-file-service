@@ -1,7 +1,6 @@
 {
 	"comment": "Module definition file.",
-	"name": "file-upload",
-	"name2": "file-service",
+	"name": "file-service",
 	"description": "Upload files as attachments for sObjects.",
 	"connectedApp": "default",
 	"files": ["FileService.php"],
