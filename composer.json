@@ -1,11 +1,11 @@
 {
-    "name": "ocdladefense/appserver-jobs",
-    "description": "A module for viewing and managing OCDLA job postings.",
+    "name": "ocdladefense/appserver-file-service",
+    "description": "A module for uploading and listng files from the Salesforce platform.",
     "type": "wordpress-theme",
     "license": "MIT",
     "authors": [
         {
-            "name": "TrevorUehlin",
+            "name": "Trevor Uehlin",
             "email": "trevoruehlinx1@gmail.com"
         }
     ],
