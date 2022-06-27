@@ -120,10 +120,17 @@ class FileServiceModule extends Module
 			$link["targetName"] = $sharingData[$id];
 		}
 
+		$grouped = [];
+		foreach($links as $link) {
+			$key = $link["ContentDocumentId"];
+			$grouped[$key][] = $link;
+		}
+
+
 		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["links" => $links]);
+		return $tpl->render(["grouped" => $grouped]);
 	}
 
 
