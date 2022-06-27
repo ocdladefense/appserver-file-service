@@ -18,7 +18,9 @@
 	"routes": {
 		"file/upload": {
 			"callback":"showForm",
-			"content-type":"text/html"
+			"content-type":"text/html",
+            "access":"is_authenticated",
+            "authorization":"webserver"
 		},
 		"file/upload/file": {
 			"callback":"upload",
@@ -26,7 +28,9 @@
 		},
 		"file/list": {
 			"callback":"list",
-			"content-type":"text/html"
+			"content-type":"text/html",
+            "access":"is_authenticated",
+            "authorization":"webserver"
 		},
 		"file/list/%listName": {
 			"callback":"list",
