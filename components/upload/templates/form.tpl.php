@@ -11,13 +11,14 @@ $sharing = array();
 
 		<?php foreach($sharing as $objectId => $label): ?>
 			<div class="form-item">
+				<?php
+					$checked = $label == "My Contact" ? "checked" : "";
+					$noClick = $label == "My Contact" ? "style='pointer-events: none;'" : "";
+				?>
 				<label><?php print $label; ?></label>
-				<input name="linkedEntityIds[]" type="checkbox" value="<?php print $objectId; ?>" />
+				<input name="linkedEntityIds[]" type="checkbox" <?php print $checked ." ". $noClick; ?> value="<?php print $objectId; ?>" />
 			</div>
 		<?php endforeach; ?>
-
-		<input type="hidden" name="linkedEntityIds[]" value="<?php print $contactId; ?>" />
-
 
 		<div class="form-item">
 			<input type="file" id="Attachments__c[]" name="Attachments__c[]" />

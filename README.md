@@ -30,4 +30,6 @@ Previously referred to as sObject Attachment sObject Documents.
 4. Upload another file with the sharing options selected.  Make sure that the ContentDocumentLink(s) have the correct LinkedEnityIds.
 
 ### Testing Script Part 2
-1. 
+1. The expectation is that if I upload a file while sharing with my contact and a committee I will see two ContentDocumentLinks with the same ContentDocumentId, and the same LinkedEntityId.  I expect to see one ContentDocumentLink with matching ContentDocumentId and LinkedEntityId for each entity I shared it with.
+
+2. 
