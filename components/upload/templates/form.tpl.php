@@ -34,6 +34,7 @@ $sharing = array();
 
 
 <style>
+	/*
 .container {
     position: relative;
     display: flex;
@@ -47,4 +48,5 @@ $sharing = array();
 	padding: 10px;
 	margin-top:10px;
 }
+*/
 </style>
