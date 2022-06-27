@@ -96,6 +96,7 @@ class FileServiceModule extends Module
 		$user = current_user();
 		$contactId = $user->getContactId();
 		$accountId = $user->query("Contact.AccountId");
+		$sharingData = FileService::getSharingData();
 
 		// Get the Committee Ids.
 		$api = loadApi();
@@ -105,7 +106,7 @@ class FileServiceModule extends Module
 
 		$linkedEntityIds = array_merge([$contactId, $accountId], $committeeIds);
 
-		$query = "SELECT ContentDocumentId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
+		$query = "SELECT ContentDocumentId, LinkedEntityId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
 		$query = DbHelper::parseArray($query, $linkedEntityIds);
 
 		$resp = $api->query($query);
@@ -113,6 +114,11 @@ class FileServiceModule extends Module
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
 
 		$links = $resp->getRecords();
+		foreach ($links as &$link) {
+
+			$id = $link["LinkedEntityId"];
+			$link["targetName"] = $sharingData[$id];
+		}
 
 		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");

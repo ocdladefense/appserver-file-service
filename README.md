@@ -20,6 +20,14 @@ Previously referred to as sObject Attachment sObject Documents.
 
 
 
-#### Job Ids
-- "My Sample Job" id = a2C05000000qFitEAE
-- "Already Renewed" = a2C05000000qFiyEAE
+#### Testing Script
+1. While not logged in click on the "Upload Files" and "My Shared Files" and make sure you are getting the access denied message.
+
+2. After logging in, click on the links again to make sure you have access.
+
+3. Upload a file using the file upload form with none of the sharing options selected, and make sure that the "ContentDocumentLink" for the file has the current contact's ContactId for the LinkedEntityId field.
+
+4. Upload another file with the sharing options selected.  Make sure that the ContentDocumentLink(s) have the correct LinkedEnityIds.
+
+### Testing Script Part 2
+1. 
