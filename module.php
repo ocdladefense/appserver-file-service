@@ -6,7 +6,7 @@ use Http\HttpRequest;
 use Mysql\DbHelper;
 
 
-class FileSerivceModule extends Module
+class FileServiceModule extends Module
 {
 
 	public function __construct() {
@@ -16,47 +16,16 @@ class FileSerivceModule extends Module
 
 
 
+
 	public function showForm() {
-
-		$api = loadApi(); // global 
-
-		$user = current_user();
-
-		$sharing = array();
-
-		$accountId = $user->query("Contact.AccountId");
-		$accountName = $user->query("Account.Name");
-		$contactId = $user->getContactId();
-
-		$format = "SELECT Committee__c, Committee__r.Name FROM Relationship__c WHERE Contact__c = '%s'";
-
-		$query = sprintf($format, $contactId);
-
-		$result = $api->query($query);
-
-		$records = $result->getRecords();
-
-
-		if(null != $accountId) {
-			$sharing[$accountId] = "Others in {$accountName}";
-		}
-
-
-		foreach($records as $rel) {
-			$key 			= $rel["Committee__c"];
-			$name 			= $rel["Committee__r"]["Name"];
-			$sharing[$key] 	= $name;
-		}
 
 		$tpl = new Template("upload");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render([
-			"sharing"		=> $sharing,
-			"contactId"		=> $contactId
-		]);
+		return $tpl->render();
 	}
 
+	
 
 
 	public function upload(){
