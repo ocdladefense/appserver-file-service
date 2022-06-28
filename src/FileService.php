@@ -5,7 +5,7 @@
 class FileService {
 
 
-	public function downloadContentDocument($id){
+	public function downloadContentDocument($id) {
 
 		$api = $this->loadForceApi();
 
@@ -25,7 +25,7 @@ class FileService {
 	}
 
 
-	public static function getSharingData() {
+	public static function getSharingTargets() {
 
 		$api = loadApi(); // global 
 
@@ -51,7 +51,7 @@ class FileService {
 		}
 
 		if(null != $contactId) {
-			$sharing[$contactId] = "My Contact";
+			$sharing[$contactId] = "Me";
 		}
 
 

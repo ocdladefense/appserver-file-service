@@ -12,18 +12,14 @@
 
 
 
-    <?php foreach($grouped as $id => $doc) : ?>
+    <?php foreach($docs as $id => $doc): ?>
 
         <?php
-            $names = [];
-            foreach($doc as $cd) $names[] = $cd["targetName"];
-            $targetNames = implode(", ", $names);
+           $sharedWith = $sharing[$id];
         ?>
-
-        <?php $info = $doc[0]["ContentDocument"]; ?>
         
         <div class="table-row data">
-            <p class="table-cell"><?php print $targetNames; ?></p>
+            <p class="table-cell"><?php print $sharedWith; ?></p>
             <p class="table-cell"><?php print $info["Title"]; ?></p>
             <p class="table-cell"><?php print $info["FileExtension"]; ?></p>
             <p class="table-cell"><?php print $info["ContentSize"] . " kb"; ?></p>
