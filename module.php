@@ -117,6 +117,7 @@ class FileServiceModule extends Module
 		$query = DbHelper::parseArray($format2, $docIds);
 		$resp = $api->query($query);
 		
+		
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
 
 		$result = $resp->getQueryResult();
@@ -140,9 +141,20 @@ class FileServiceModule extends Module
 				return empty($prev) ? $current : ($prev . ", " . $current);
 			};
 			$foo = array_reduce($sharing, $cb);
-			$sharedWith[$docId] = $foo;
-		}
 
+			$targetIds = array_map(function($share){
+				return $share["LinkedEntityId"];
+			}, $sharing);
+
+			$sharedWith[$docId] = array(
+				"targetIds" => $targetIds,
+				"targetNames" => $foo,
+				"isOwner"	=> in_array(current_user()->getContactId(), $targetIds)
+			);
+
+			
+			// look here to find sharing
+		}
 
 
 		$tpl = new Template("list");
@@ -170,6 +182,12 @@ class FileServiceModule extends Module
 		$file->setType($resp->getHeader("Content-Type"));
 
 		return $file;
+	}
+
+
+	public function deleteContentDocument($id) {
+
+		var_dump("Hello from delete");exit;
 	}
 
 	

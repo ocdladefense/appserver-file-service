@@ -18,7 +18,7 @@
 
         <?php foreach($docs as $id => $doc): ?>
 
-            <?php $sharedWith = $sharing[$id]; ?>
+            <?php $sharedWith = $sharing[$id]["targetNames"]; ?>
             
             <div class="table-row data">
                 <p class="table-cell"><?php print $sharedWith; ?></p>
@@ -28,9 +28,9 @@
                 <p class="table-cell icon-cell">
                     <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
                 </p>
-                <p class="table-cell icon-cell">
-                    <a href="/file/delete/<?php print $id; ?>"><i class="fa fa-trash"></i></a>
-                </p>
+                
+                <?php $delete = $sharing[$id]["isOwner"] ? "<a href='/file/delete/<?php print $id; ?>'><i class='fa fa-trash'></i></a>" : "--";  ?>
+                <p class="table-cell icon-cell"><?php print $delete; ?></p>
             </div>
         
         <?php endforeach; ?>
