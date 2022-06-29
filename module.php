@@ -102,8 +102,16 @@ class FileServiceModule extends Module
 		// Actual sharing targets (document links).
 		$targets = FileService::getSharingTargets(array_keys($sharePoints));
 
+
+		if($targets->count() == 0) {
+			$tpl = new Template("no-records");
+			$tpl->addPath(__DIR__ . "/templates");
+			return $tpl;
+		}
+		
 		// var_dump($docs);exit;
 		$found = $targets->getField("LinkedEntityId");
+
 
 		$docIds = $targets->getField("ContentDocumentId");
 
