@@ -1,15 +1,15 @@
-<?php
-/*
-$sharing = array();
-*/
-
-?>
-
-<h2>OCDLA: Upload a File</h2>
 
 
+<link rel="stylesheet" type="text/css" href="<?php print module_path(); ?>/assets/upload.css" />
 
-<?php component("UploadComponent"); ?>
+<div class="container">
+
+    <h2 class="header">OCDLA: Upload a File</h2>
+
+    <?php component("UploadComponent"); ?>
+
+</div>
+
 
 
 

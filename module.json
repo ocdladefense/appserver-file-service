@@ -40,6 +40,10 @@
 			"callback":"downloadContentDocument",
 			"content-type":"text/html"
 		},
+		"file/delete/%id": {
+			"callback":"deleteContentDocument",
+			"content-type":"text/html"
+		},
 		"attachment/%id":{
 			"callback": "getAttachment",
 			"content-type": "application/base64"

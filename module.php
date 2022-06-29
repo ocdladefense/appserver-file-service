@@ -113,8 +113,6 @@ class FileServiceModule extends Module
 
 		$groups = $targets->group($fn);
 
-		
-
 		$format2 = "SELECT Id, CreatedById, CreatedDate, LastModifiedById, LastModifiedDate, IsDeleted, OwnerId, Title, PublishStatus, LatestPublishedVersionId, ParentId, LastViewedDate, Description, ContentSize, FileType, FileExtension, SharingOption, SharingPrivacy, ContentModifiedDate, ContentAssetId FROM ContentDocument WHERE Id IN (:array)";
 		$query = DbHelper::parseArray($format2, $docIds);
 		$resp = $api->query($query);
@@ -139,7 +137,7 @@ class FileServiceModule extends Module
 				$prev = $carry ?? "";
 				$linkId = $share["LinkedEntityId"];
 				$current = $sharePoints[$linkId];
-				return empty($prev) ? $current : ($prev . "," . $current);
+				return empty($prev) ? $current : ($prev . ", " . $current);
 			};
 			$foo = array_reduce($sharing, $cb);
 			$sharedWith[$docId] = $foo;
@@ -250,13 +248,12 @@ class FileServiceModule extends Module
 	 * 
 	 * Given a list of record ids, get the related ContentDocumentLink records.
 	 */
-	public function getContentDocumentLinks($jobIds){
+	public function getContentDocumentLinks($sObjectIds){
 
-		$jobIdString = "'" . implode("','", $jobIds) . "'";
-
+		$linkedEntityIds = "'" . implode("','", $sObjectIds) . "'";
 
 		$api = loadApi();
-		$query = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN ($jobIdString)";
+		$query = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN ($linkedEntityIds)";
 		$resp = $api->query($query);
 
 		if(!$resp->isSuccess()) throw new Exception($resp->getErrorMessage());

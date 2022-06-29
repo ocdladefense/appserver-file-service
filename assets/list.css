@@ -1,0 +1,10 @@
+.table{
+    width: auto;
+}
+.table-row p{
+    width:5%;
+    text-align: center;
+}
+.icon-cell{
+    text-align: center;
+}

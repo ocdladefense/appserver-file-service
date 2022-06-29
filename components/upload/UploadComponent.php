@@ -56,7 +56,7 @@ class UploadComponent extends Presentation\Component {
 	public function toHtml($params = array()) {
 
 		$contactId = current_user()->getContactId();
-		$sharing = FileService::getSharingData();
+		$sharing = FileService::getCurrentUserSharingTargets();
 
 		$tpl = new Template("form");
 		$tpl->addPath(__DIR__ . "/templates");
