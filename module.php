@@ -94,32 +94,26 @@ class FileServiceModule extends Module
 	public function list($list = null) {
 
 
-		$sharingData = FileService::getSharingTargets();
-
-		// Get the Committee Ids.
 		$api = loadApi();
 
+		// Possible sharing targets for the current user.
+		$sharePoints = FileService::getCurrentUserSharingTargets();
 
-		$format = "SELECT ContentDocumentId, LinkedEntityId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array) ORDER BY ContentDocumentId, LinkedEntityId";
-		$query = DbHelper::parseArray($format, array_keys($sharingData));
+		// Actual sharing targets (document links).
+		$targets = FileService::getSharingTargets(array_keys($sharePoints));
 
-		$resp = $api->query($query);
+		// var_dump($docs);exit;
+		$found = $targets->getField("LinkedEntityId");
 
-		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
-
-		$links = $resp->getQueryResult();
-
-		$found = $resp->getField("LinkedEntityId");
-
-		$docIds = $resp->getField("ContentDocumentId");
+		$docIds = $targets->getField("ContentDocumentId");
 
 		$fn = function($share) {
 			return $share["ContentDocumentId"];
 		};
 
-		$groups = $resp->group($fn);
+		$groups = $targets->group($fn);
 
-		var_dump($docs);exit;
+		
 
 		$format2 = "SELECT Id, CreatedById, CreatedDate, LastModifiedById, LastModifiedDate, IsDeleted, OwnerId, Title, PublishStatus, LatestPublishedVersionId, ParentId, LastViewedDate, Description, ContentSize, FileType, FileExtension, SharingOption, SharingPrivacy, ContentModifiedDate, ContentAssetId FROM ContentDocument WHERE Id IN (:array)";
 		$query = DbHelper::parseArray($format2, $docIds);
@@ -128,21 +122,23 @@ class FileServiceModule extends Module
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
 
 		$result = $resp->getQueryResult();
+		
 		// Key the result by the 
 		$docs = $result->key("Id");
 
-		// var_dump($records);exit;
+		// var_dump($docs);exit;
 
 		$sharedWith = [];
 
 
-
-		// groupedDocs
+		// var_dump($groups);exit;
+		// We still need this.
 		foreach($groups as $docId => $sharing)  {
 
-			$cb = function($carry, $share) {
+			$cb = function($carry, $share) use ($sharePoints){
 				$prev = $carry ?? "";
-				$current = $share["targetName"];
+				$linkId = $share["LinkedEntityId"];
+				$current = $sharePoints[$linkId];
 				return empty($prev) ? $current : ($prev . "," . $current);
 			};
 			$foo = array_reduce($sharing, $cb);
