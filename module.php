@@ -187,7 +187,11 @@ class FileServiceModule extends Module
 
 	public function deleteContentDocument($id) {
 
-		var_dump("Hello from delete");exit;
+		$api = loadApi();
+		$resp = $api->delete("ContentDocument", $id);
+
+		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
+		else return redirect("/file/list");
 	}
 
 	
