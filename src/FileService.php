@@ -1,31 +1,33 @@
 <?php
 
+use Mysql\DbHelper;
+
 
 
 class FileService {
 
 
-	public function downloadContentDocument($id) {
+	
 
-		$api = $this->loadForceApi();
 
-		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = True";
 
-		$version = $api->query($query)->getRecord();
-		$versionUrl = $version["VersionData"];
+	public static function getSharingTargets($sharingTargets) {
+		$api = loadApi();
 
-		$api2 = $this->loadForceApi();
-		$resp = $api2->send($versionUrl);
 
-		$file = new File($version["Title"]);
-		$file->setContent($resp->getBody());
-		$file->setType($resp->getHeader("Content-Type"));
+		$format = "SELECT ContentDocumentId, LinkedEntityId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array) ORDER BY ContentDocumentId, LinkedEntityId";
+		$query = DbHelper::parseArray($format, $sharingTargets);
 
-		return $file;
+		$resp = $api->query($query);
+
+		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
+
+		return $resp->getQueryResult();
 	}
 
 
-	public static function getSharingTargets() {
+
+	public static function getCurrentUserSharingTargets() {
 
 		$api = loadApi(); // global 
 
@@ -65,5 +67,24 @@ class FileService {
 	}
 
 
+
+	public function downloadContentDocument($id) {
+
+		$api = $this->loadForceApi();
+
+		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = True";
+
+		$version = $api->query($query)->getRecord();
+		$versionUrl = $version["VersionData"];
+
+		$api2 = $this->loadForceApi();
+		$resp = $api2->send($versionUrl);
+
+		$file = new File($version["Title"]);
+		$file->setContent($resp->getBody());
+		$file->setType($resp->getHeader("Content-Type"));
+
+		return $file;
+	}
 
 }
