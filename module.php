@@ -150,9 +150,6 @@ class FileServiceModule extends Module
 
 			$targetNames = array_reduce($sharing, $cb);
 
-			// Ha Ha Ha
-			$targetNames = str_replace(" Me,", "", $targetNames);
-
 			$targetIds = array_map(function($share){
 				return $share["LinkedEntityId"];
 			}, $sharing);

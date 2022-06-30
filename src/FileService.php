@@ -47,13 +47,12 @@ class FileService {
 
 		$records = $result->getRecords();
 
+		if(null != $contactId) {
+			$sharing[$contactId] = "Me";
+		}
 
 		if(null != $accountId) {
 			$sharing[$accountId] = "Others in {$accountName}";
-		}
-
-		if(null != $contactId) {
-			$sharing[$contactId] = "Me";
 		}
 
 

@@ -9,6 +9,8 @@
 				<label><?php print $label; ?></label>
 			</div>
 		<?php endforeach; ?>
+
+		<input type="hidden" name="linkedEntityIds[]" value="<?php print $contactId; ?>">
 	</div>
 
 	<div class="form-item">

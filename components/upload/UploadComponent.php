@@ -58,7 +58,15 @@ class UploadComponent extends Presentation\Component {
 		$contactId = current_user()->getContactId();
 		$sharing = FileService::getCurrentUserSharingTargets();
 
-		var_dump($sharing);exit;
+
+		// Doing this for now!  Not really sure how Im going to deal with this yet.
+		// Gonna probably want to remove the contact id from the sharing array.  don't need it in the sharing here anymore.
+		// Now just gotta figure out how to not need it in the sharing array in the list function either.
+		$sharing = array_filter($sharing, function($item){
+
+			return $item !== "Me";
+		});
+
 
 		$tpl = new Template("form");
 		$tpl->addPath(__DIR__ . "/templates");
