@@ -4,45 +4,81 @@
 
 <div class="container">
 
-    <div class="table">
-        <div class="table-row first">
-            <p class="table-header">Shared With</p>
-            <p class="table-header">Title</p>
-            <p class="table-header">Type</p>
-            <p class="table-header">Size</p>
-            <p class="table-header">Download</p>
-            <p class="table-header">Delete</p>
-        </div>
+    <div>
+        <h2>My Documents</h2>
+        <br />
+
+        <div class="table">
+            <div class="table-row first">
+                <p class="table-header">Shared With</p>
+                <p class="table-header">Title</p>
+                <p class="table-header">Type</p>
+                <p class="table-header">Size</p>
+                <p class="table-header">Download</p>
+                <p class="table-header">Delete</p>
+            </div>
 
 
 
-        <?php foreach($docs as $id => $doc): ?>
-
-            <?php $sharedWith = $sharing[$id]["targetNames"]; ?>
-            
-            <div class="table-row data">
-                <p class="table-cell"><?php print $sharedWith; ?></p>
-                <p class="table-cell"><?php print $doc["Title"]; ?></p>
-                <p class="table-cell"><?php print $doc["FileExtension"]; ?></p>
-                <p class="table-cell"><?php print $doc["ContentSize"] . " kb"; ?></p>
-                <p class="table-cell icon-cell">
-                    <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
-                </p>
+            <?php foreach($myDocuments as $id => $doc): ?>
                 
-                <?php if($sharing[$id]["isOwner"]) : ?>
+                <div class="table-row data">
+                    <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["Title"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["FileExtension"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["ContentSize"] . " kb"; ?></p>
+                    <p class="table-cell icon-cell">
+                        <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
+                    </p>
+
                     <p class="table-cell icon-cell">
                         <a href="/file/delete/<?php print $id; ?>" onClick="return confirm('Are you sure you want to delete this document?');">
                             <i class='fa fa-trash'></i>
                         </a>
                     </p>
-                <?php else : ?>
-                    <p class="table-cell icon-cell">--</p>
-                <?php endif; ?>
-            </div>
-        
-        <?php endforeach; ?>
+                </div>
+            
+            <?php endforeach; ?>
 
+        </div>
     </div>
+         <br />
+         <br />
+    <div>
+        <h2>Shared Documents</h2>
+        <br />
+
+        <div class="table">
+            <div class="table-row first">
+                <p class="table-header">Shared By</p>
+                <p class="table-header">Title</p>
+                <p class="table-header">Type</p>
+                <p class="table-header">Size</p>
+                <p class="table-header">Download</p>
+                <p class="table-header"></p>
+            </div>
+
+
+
+            <?php foreach($sharedDocuments as $id => $doc): ?>
+                
+                <div class="table-row data">
+                    <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["Title"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["FileExtension"]; ?></p>
+                    <p class="table-cell"><?php print $doc["data"]["ContentSize"] . " kb"; ?></p>
+                    <p class="table-cell icon-cell">
+                        <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
+                    </p>
+                    <p class="table-cell"></p>
+
+                </div>
+            
+            <?php endforeach; ?>
+
+        </div>
+    </div>
+    
 </div>
 
 

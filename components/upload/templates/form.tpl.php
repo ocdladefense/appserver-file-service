@@ -5,11 +5,7 @@
 		<h3>Sharing With:</h3>
 		<?php foreach($sharing as $objectId => $label): ?>
 			<div>
-				<?php
-					$checked = $label == "Me" ? "checked" : "";
-					$noClick = $label == "Me" ? "style='pointer-events: none;'" : "";
-				?>
-				<input name="linkedEntityIds[]" type="checkbox" <?php print $checked ." ". $noClick; ?> value="<?php print $objectId; ?>" />
+				<input name="linkedEntityIds[]" type="checkbox" value="<?php print $objectId; ?>" />
 				<label><?php print $label; ?></label>
 			</div>
 		<?php endforeach; ?>

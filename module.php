@@ -132,10 +132,9 @@ class FileServiceModule extends Module
 		
 		// Key the result by the 
 		$docs = $result->key("Id");
-
-		// var_dump($docs);exit;
-
-		$sharedWith = [];
+		$contactId = current_user()->getContactId();
+		$myDocuments = [];
+		$sharedDocuments = [];
 
 
 		// var_dump($groups);exit;
@@ -148,27 +147,42 @@ class FileServiceModule extends Module
 				$current = $sharePoints[$linkId];
 				return empty($prev) ? $current : ($prev . ", " . $current);
 			};
-			$foo = array_reduce($sharing, $cb);
+
+			$targetNames = array_reduce($sharing, $cb);
+
+			// Ha Ha Ha
+			$targetNames = str_replace(" Me,", "", $targetNames);
 
 			$targetIds = array_map(function($share){
 				return $share["LinkedEntityId"];
 			}, $sharing);
 
-			$sharedWith[$docId] = array(
-				"targetIds" => $targetIds,
-				"targetNames" => $foo,
-				"isOwner"	=> in_array(current_user()->getContactId(), $targetIds)
-			);
+			if(in_array($contactId, $targetIds)) {
 
-			
-			// look here to find sharing
+				$myDocuments[$docId] = [
+					"targetIds" => $targetIds,
+					"targetNames" => $targetNames,
+					"data" => $docs[$docId]
+				];
+
+			} else {
+				
+				$sharedDocuments[$docId] = [
+					"targetIds" => $targetIds,
+					"targetNames" => $targetNames,
+					"data" => $docs[$docId]
+				];
+			}
 		}
 
 
 		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["docs" => $docs, "sharing" => $sharedWith]);
+		return $tpl->render([
+			"myDocuments" => $myDocuments,
+			"sharedDocuments" => $sharedDocuments,
+		]);
 	}
 
 
