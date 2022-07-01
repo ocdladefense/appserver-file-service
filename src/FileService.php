@@ -12,8 +12,8 @@ class FileService {
 
 
 	public static function getSharingTargets($sharingTargets) {
-		$api = loadApi();
 
+		$api = loadApi();
 
 		$format = "SELECT ContentDocumentId, LinkedEntityId, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileExtension FROM ContentDocumentLink WHERE LinkedEntityId IN (:array) ORDER BY ContentDocumentId, LinkedEntityId";
 		$query = DbHelper::parseArray($format, $sharingTargets);
