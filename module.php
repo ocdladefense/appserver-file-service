@@ -99,12 +99,7 @@ class FileServiceModule extends Module
 		// Possible sharing targets for the current user.
 		$sharePoints = FileService::getCurrentUserSharingTargets();
 
-		// $contactId = current_user()->getContactId();
-		// $contactIncluded = array_merge($sharePoints, [$contactId => ""]);
-
-		// Actual sharing targets (document links).
 		$targets = FileService::getSharingTargets(array_keys($sharePoints));
-
 
 		if($targets->count() == 0) {
 			$tpl = new Template("no-records");
@@ -114,8 +109,6 @@ class FileServiceModule extends Module
 		
 		// var_dump($docs);exit;
 		$found = $targets->getField("LinkedEntityId");
-
-
 
 		$docIds = $targets->getField("ContentDocumentId");
 
@@ -140,16 +133,13 @@ class FileServiceModule extends Module
 		$myDocuments = [];
 		$sharedDocuments = [];
 
-
-		// var_dump($groups);exit;
-		// We still need this.
 		foreach($groups as $docId => $sharing)  {
 
 			$cb = function($carry, $share) use ($sharePoints, $contactId){
 				$prev = $carry ?? "";
 				$linkId = $share["LinkedEntityId"];
 				$current = $sharePoints[$linkId];
-				
+
 				if($linkId == $contactId) return $prev;
 
 				return empty($prev) ? $current : ($prev . ", " . $current);
