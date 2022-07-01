@@ -149,16 +149,13 @@ class FileServiceModule extends Module
 				$prev = $carry ?? "";
 				$linkId = $share["LinkedEntityId"];
 				$current = $sharePoints[$linkId];
-				if($linkId == $contactId) $current = "";
+				
+				if($linkId == $contactId) return $prev;
+
 				return empty($prev) ? $current : ($prev . ", " . $current);
 			};
 
 			$targetNames = array_reduce($sharing, $cb);
-
-			$targetNames = str_replace([" ,"], "", $targetNames);
-			$targetNames = trim($targetNames, ", ");
-
-			//var_dump($targetNames);exit;
 
 			$targetIds = array_map(function($share){
 				return $share["LinkedEntityId"];
