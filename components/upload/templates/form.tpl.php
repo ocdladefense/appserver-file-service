@@ -14,7 +14,7 @@
 	</div>
 
 	<div class="form-item">
-		<input type="file" id="Attachments__c[]" name="Attachments__c[]" />
+		<input type="file" id="Attachments__c[]" name="Attachments__c[]"  required />
 	</div>
 
 	<div class="form-item">
