@@ -1,16 +1,4 @@
-.container{
-    border:1px solid;
-    padding: 1.5rem;
-    max-width: 65%;
-    margin:auto;
-}
-.header{
-    text-align: center;
-    margin: 0 0 45px 0;
-}
-.sharing{
-    float:right;
-}
+
 .sharing label{
     display: inline;
     font-size:medium;
