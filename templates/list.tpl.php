@@ -6,9 +6,13 @@
 
     <div>
         <h2 style="display:inline; margin-right:15px;">My Documents</h2>
-        <a href="<?php print $contactUrl; ?>" target="_blank">View on Salesforce</a>
-        <br />
+        <form action="<?php print $contactUrl; ?>" style="display:inline;">
+            <button type="submit">View on Salesforce</button>
+        </form>
 
+        <br />
+        <br />
+        
         <div class="table">
             <div class="table-row first">
                 <p class="table-header">Shared With</p>
