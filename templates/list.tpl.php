@@ -24,9 +24,11 @@
                 
                 <div class="table-row data">
                     <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["Title"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["FileExtension"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["ContentSize"] . " kb"; ?></p>
+                    <p class="table-cell">
+                        <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>
+                    </p>
+                    <p class="table-cell"><?php print $doc["FileExtension"]; ?></p>
+                    <p class="table-cell"><?php print $doc["ContentSize"]; ?></p>
                     <p class="table-cell icon-cell">
                         <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
                     </p>
@@ -63,10 +65,12 @@
             <?php foreach($sharedDocuments as $id => $doc): ?>
                 
                 <div class="table-row data">
-                    <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["Title"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["FileExtension"]; ?></p>
-                    <p class="table-cell"><?php print $doc["data"]["ContentSize"] . " kb"; ?></p>
+                <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
+                    <p class="table-cell">
+                        <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>
+                    </p>
+                    <p class="table-cell"><?php print $doc["FileExtension"]; ?></p>
+                    <p class="table-cell"><?php print $doc["ContentSize"]; ?></p>
                     <p class="table-cell icon-cell">
                         <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
                     </p>
