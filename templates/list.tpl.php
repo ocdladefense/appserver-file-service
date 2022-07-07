@@ -5,7 +5,8 @@
 <div class="container">
 
     <div>
-        <h2>My Documents</h2>
+        <h2 style="display:inline; margin-right:5px;">My Documents</h2>
+        <a href="<?php print $contactUrl; ?>" target="_blank">View on Salesforce</a>
         <br />
 
         <div class="table">
@@ -28,7 +29,7 @@
                         <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>
                     </p>
                     <p class="table-cell"><?php print $doc["FileExtension"]; ?></p>
-                    <p class="table-cell"><?php print $doc["ContentSize"]; ?></p>
+                    <p class="table-cell"><?php print $doc["fileSize"]; ?></p>
                     <p class="table-cell icon-cell">
                         <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
                     </p>
@@ -70,7 +71,7 @@
                         <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>
                     </p>
                     <p class="table-cell"><?php print $doc["FileExtension"]; ?></p>
-                    <p class="table-cell"><?php print $doc["ContentSize"]; ?></p>
+                    <p class="table-cell"><?php print $doc["fileSize"]; ?></p>
                     <p class="table-cell icon-cell">
                         <a href="/file/download/<?php print $id; ?>"><i class="fa-solid fa-download"></i></a>
                     </p>
