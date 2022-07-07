@@ -5,7 +5,7 @@
 <div class="container">
 
     <div>
-        <h2 style="display:inline; margin-right:5px;">My Documents</h2>
+        <h2 style="display:inline; margin-right:15px;">My Documents</h2>
         <a href="<?php print $contactUrl; ?>" target="_blank">View on Salesforce</a>
         <br />
 
