@@ -156,6 +156,7 @@ class FileServiceModule extends Module
 
 			$docs[$docId]["targetIds"] = $targetIds;
 			$docs[$docId]["targetNames"] = $targetNames;
+			$docs[$docId]["fileSize"] = calculateFileSize($docs[$docId]["ContentSize"]);
 			// Calculate the filesize here, not in the template file.
 
 			if(in_array($contactId, $targetIds)) {
@@ -168,6 +169,10 @@ class FileServiceModule extends Module
 			}
 		}
 
+		$contactUrl = cache_get("instance_url") . "/$contactId";
+
+		//var_dump($contactUrl);exit;
+
 
 		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");
@@ -175,6 +180,7 @@ class FileServiceModule extends Module
 		return $tpl->render([
 			"myDocuments" => $myDocuments,
 			"sharedDocuments" => $sharedDocuments,
+			"contactUrl" => $contactUrl
 		]);
 	}
 
@@ -326,7 +332,7 @@ class FileServiceModule extends Module
 
 
 
-/////////////////////////	ATTACHMENT STUFF	////////////////////////////////////////////////////////////////////////
+	/////////////////////////	ATTACHMENT STUFF	////////////////////////////////////////////////////////////////////////
 
 		// Get the FileList" object from the request, use the first file to build an "Attachment/File" object,
 	// insert the Attachment, and return the id.
@@ -359,19 +365,6 @@ class FileServiceModule extends Module
 		$attResults = $api->query("SELECT Id, Name FROM Attachment WHERE ParentId = '{$jobId}'");
 
 		return $attResults->getRecords();
-	}
 
-
-
-
-	public function groupDocuments() {
-
-		$sobjPrefix = [
-			"003" => "Contact",
-			"001" => "Account",
-			"a2G" => "Committee"
-		];
 	}
 }
-
-
