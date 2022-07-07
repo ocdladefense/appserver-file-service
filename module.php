@@ -151,21 +151,20 @@ class FileServiceModule extends Module
 				return $share["LinkedEntityId"];
 			}, $sharing);
 
+
+
+
+			$docs[$docId]["targetIds"] = $targetIds;
+			$docs[$docId]["targetNames"] = $targetNames;
+			// Calculate the filesize here, not in the template file.
+
 			if(in_array($contactId, $targetIds)) {
 
-				$myDocuments[$docId] = [
-					"targetIds" => $targetIds,
-					"targetNames" => $targetNames,
-					"data" => $docs[$docId]
-				];
+				$myDocuments[$docId] = $docs[$docId];
 
 			} else {
 				
-				$sharedDocuments[$docId] = [
-					"targetIds" => $targetIds,
-					"targetNames" => $targetNames,
-					"data" => $docs[$docId]
-				];
+				$sharedDocuments[$docId] = $docs[$docId];
 			}
 		}
 
