@@ -12,7 +12,7 @@
 		},
 		{
 			"href":"/file/list",
-			"label": "My Shared Files"
+			"label": "My Files"
 		}
 	],
 	"routes": {
