@@ -169,7 +169,8 @@ class FileServiceModule extends Module
 			}
 		}
 
-		$contactUrl = cache_get("instance_url") . "/$contactId";
+		//$contactUrl = cache_get("instance_url") . "/$contactId";
+		$contactUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 
 		//var_dump($contactUrl);exit;
 

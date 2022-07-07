@@ -6,9 +6,12 @@
 
     <div>
         <h2 style="display:inline; margin-right:15px;">My Documents</h2>
-        <form action="<?php print $contactUrl; ?>" target="_blank" style="display:inline;">
-            <button type="submit">View on Salesforce</button>
-        </form>
+
+        <?php if(current_user()->isAdmin()): ?>
+            <form action="<?php print $contactUrl; ?>" target="_blank" style="display:inline;">
+                <button type="submit">View on Salesforce</button>
+            </form>
+        <?php endif; ?>
 
         <br />
         <br />
