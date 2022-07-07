@@ -1,10 +1,13 @@
-.table{
-    width: auto;
+
+
+
+.table-row p.table-cell,
+.table-row p.table-header {
+    padding:7px;
+    padding-left:13px;
+    padding-right:13px;
 }
-.table-row p{
-    width:5%;
-    text-align: center;
-}
-.icon-cell{
-    text-align: center;
+
+.table-row p.icon-cell {
+
 }
