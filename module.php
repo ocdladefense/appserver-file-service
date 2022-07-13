@@ -96,92 +96,42 @@ class FileServiceModule extends Module
 
 		$api = loadApi();
 
+		$contactId = current_user()->getContactId();
+
+
+
+		$service = FileService::fromUser(current_user());
+
 		// Possible sharing targets for the current user.
-		$sharePoints = FileService::getCurrentUserSharingTargets();
+		// These usually include the contactId, accountId and any committeeIds.
+		$sharePoints = $service->getSharePoints();
 
-		$targets = FileService::getSharingTargets(array_keys($sharePoints));
 
+
+		// The actual shared documents.
+		$targets = $service->getSharingTargets();
+
+
+		// If no documents, then display accordingly.
 		if($targets->count() == 0) {
 			$tpl = new Template("no-records");
 			$tpl->addPath(__DIR__ . "/templates");
 			return $tpl;
 		}
 		
-		// var_dump($docs);exit;
-		$found = $targets->getField("LinkedEntityId");
-
-		$docIds = $targets->getField("ContentDocumentId");
-
-		$fn = function($share) {
-			return $share["ContentDocumentId"];
-		};
-
-		$groups = $targets->group($fn);
-
-		$format2 = "SELECT Id, CreatedById, CreatedDate, LastModifiedById, LastModifiedDate, IsDeleted, OwnerId, Title, PublishStatus, LatestPublishedVersionId, ParentId, LastViewedDate, Description, ContentSize, FileType, FileExtension, SharingOption, SharingPrivacy, ContentModifiedDate, ContentAssetId FROM ContentDocument WHERE Id IN (:array)";
-		$query = DbHelper::parseArray($format2, $docIds);
-		$resp = $api->query($query);
-		
-		
-		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
-
-		$result = $resp->getQueryResult();
-		
-		// Key the result by the 
-		$docs = $result->key("Id");
-		$contactId = current_user()->getContactId();
-		$myDocuments = [];
-		$sharedDocuments = [];
-
-		foreach($groups as $docId => $sharing)  {
-
-			$cb = function($carry, $share) use ($sharePoints, $contactId){
-				$prev = $carry ?? "";
-				$linkId = $share["LinkedEntityId"];
-				$current = $sharePoints[$linkId];
-
-				if($linkId == $contactId) return $prev;
-
-				return empty($prev) ? $current : ($prev . ", " . $current);
-			};
-
-			$targetNames = array_reduce($sharing, $cb);
-
-			$targetIds = array_map(function($share){
-				return $share["LinkedEntityId"];
-			}, $sharing);
 
 
+		$service->loadAvailableDocuments();
 
-
-			$docs[$docId]["targetIds"] = $targetIds;
-			$docs[$docId]["targetNames"] = $targetNames;
-			$docs[$docId]["fileSize"] = calculateFileSize($docs[$docId]["ContentSize"]);
-			// Calculate the filesize here, not in the template file.
-
-			if(in_array($contactId, $targetIds)) {
-
-				$myDocuments[$docId] = $docs[$docId];
-
-			} else {
-				
-				$sharedDocuments[$docId] = $docs[$docId];
-			}
-		}
-
-		//$contactUrl = cache_get("instance_url") . "/$contactId";
-		$contactUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
-
-		//var_dump($contactUrl);exit;
-
+		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 
 		$tpl = new Template("list");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render([
-			"myDocuments" => $myDocuments,
-			"sharedDocuments" => $sharedDocuments,
-			"contactUrl" => $contactUrl
+			"myDocuments"		=> $service->getMyDocuments(),
+			"sharedDocuments"	=> $service->getDocumentsSharedWithMe(),
+			"contactUrl"		=> $salesforceUrl
 		]);
 	}
 
