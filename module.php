@@ -118,10 +118,13 @@ class FileServiceModule extends Module
 			$tpl->addPath(__DIR__ . "/templates");
 			return $tpl;
 		}
+
+		
 		
 
 
 		$service->loadAvailableDocuments();
+		// var_dump($service->getDocumentsSharedWithMe());exit;
 
 		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 

@@ -67,42 +67,49 @@ class FileService {
 
 
 
-/*
-	public static function getUploadedBy($documents) {
+	public function includeUploadedBy() {
 
-		// Query for ContentDocumentLinks WHERE ContentDocumentId IN(:array)
+		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId IN (:array)";
+		$query = DbHelper::parseArray($format, array_keys($this->sharedWithMe));
+		$records = loadApi()->query($query)->getRecords();
 
-		$query = DbHelper::parseArray($format, array_keys($documents));
+		$contactPrefix = "003";
+		$docs = [];
 
-		$records = $api->query($query)->getRecords();
-
-		$contactPrefix = "abc";
-
-
-		$owners = array();
-
+		$systemAdminUserId = "005j0000000TYQpAAO"; 
 
 		foreach($records as $record) {
-			// if $record starts with $contactPrefix {
-				$owners[$record["ContentDocumentId"]] = $record["LinkedEntityId"];
+
+			$prefix = substr($record["LinkedEntityId"], 0, 3);
+
+			if($prefix == $contactPrefix) {
+				$docs[$record["ContentDocumentId"]] = $record["LinkedEntityId"];
 			}
 			else {
-				continue;
+				$docs[$record["ContentDocumentId"]] = $systemAdminUserId;
 			}
 		}
 
 		// Perform a subquery against the contact object using array_values($owners);
-		$contactResult = $resp->getQueryResult();
+		$format = "SELECT Id, Name FROM Contact WHERE Id IN (:array)";
+		$query = DbHelper::parseArray($format, $docs);
+		$records = loadApi()->query($query)->getQueryResult();
+		$contacts = $records->key("Id");
 		
 
-		// Key the result by the document Id.
-		$docs = $contactResult->key("Id");
+		foreach($docs as $docId => $contactId) {
 
-		// Add more info to $owners so that we can eventually display the name.
+			if($contactId == $systemAdminUserId) {
 
-		return $owners;
+				$this->sharedWithMe[$docId]["uploadedBy"] = "OCDLA App";
+
+			} else {
+				
+				$this->sharedWithMe[$docId]["uploadedBy"] = $contacts[$contactId]["Name"];
+				$this->sharedWithMe[$docId]["uploadedById"] = $contactId;
+			}
+		}
 	}
-*/
 
 
 	public function loadAvailableDocuments() {
@@ -165,9 +172,6 @@ class FileService {
 				return $share["LinkedEntityId"];
 			}, $sharing);
 
-
-
-
 			$docs[$docId]["targetIds"] = $targetIds;
 			$docs[$docId]["targetNames"] = $targetNames;
 			// $docs[$docId]["uploadedBy"] = // Given the document id, search for all contentdocumentlinks related to this document; from the list, identify the one record that is associated with a Contact; that record represents the "owner" of the document, i.e., the person who uploaded it.
@@ -186,8 +190,8 @@ class FileService {
 			}
 
 		}
-		// Return a QueryResult object.
-		// return $result;
+
+		$this->includeUploadedBy();
 	}
 
 

@@ -72,14 +72,26 @@
 
 
             <?php foreach($sharedDocuments as $id => $doc): ?>
+
+                <?php
+                    $names = explode(", ", $doc["targetNames"]);
+                    $links = array_map(function($name){
+                        return "<a href='/committee/" . Identifier::toMachineName($name) . "'>$name</a>";
+                    }, $names);
+
+                 ?>
                 
                 <div class="table-row data">
 
                     <!-- Shared By -->
-                    <p class="table-cell"><?php print $doc["uploadedBy"]; ?></p>
+                    <p class="table-cell">
+                        <a href="/directory/members/<?php print $doc["uploadedById"]; ?>">
+                            <?php print $doc["uploadedBy"]; ?>
+                        </a>
+                    </p>
 
                     <!-- Shared With -->
-                    <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
+                    <p class="table-cell"><?php print implode(", ", $links); ?></p>
 
                     <p class="table-cell">
                         <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>

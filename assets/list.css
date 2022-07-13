@@ -11,3 +11,7 @@
 .table-row p.icon-cell {
 
 }
+
+.icon-cell {
+    text-align: center;
+}

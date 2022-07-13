@@ -56,7 +56,12 @@ class UploadComponent extends Presentation\Component {
 	public function toHtml($params = array()) {
 
 		$contactId = current_user()->getContactId();
-		$sharing = FileService::getCurrentUserSharingTargets();
+		//$contactId = "0035b00002fonLKAAY";
+
+		$service = FileService::fromUser(current_user());
+		$sharing = $service->getSharePoints();
+
+		array_shift($sharing);
 
 
 		// Doing this for now!  Not really sure how Im going to deal with this yet.
