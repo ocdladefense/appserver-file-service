@@ -1,6 +1,6 @@
 <link rel="stylesheet" type="text/css" href="<?php print module_path(); ?>/assets/list.css" />
 
-<h1 class="list-header">My Documents</h1>
+<h1 class="list-header">Available Documents</h1>
 
 <div class="container">
 
@@ -55,13 +55,12 @@
          <br />
          <br />
     <div>
-        <h2>Documents Shared With Me</h2>
+        <h2>Shared Documents</h2>
         <br />
 
         <div class="table">
             <div class="table-row first">
-                <p class="table-header">Shared By</p><!-- Person who uploaded it. -->
-                <p class="table-header">Shared With</p><!-- Non-contact entities this document is shared with. -->
+                <p class="table-header">Shared By</p>
                 <p class="table-header">Title</p>
                 <p class="table-header">Type</p>
                 <p class="table-header">Size</p>
@@ -74,13 +73,7 @@
             <?php foreach($sharedDocuments as $id => $doc): ?>
                 
                 <div class="table-row data">
-
-                    <!-- Shared By -->
-                    <p class="table-cell"><?php print $doc["uploadedBy"]; ?></p>
-
-                    <!-- Shared With -->
-                    <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
-
+                <p class="table-cell"><?php print $doc["targetNames"]; ?></p>
                     <p class="table-cell">
                         <a href="/file/download/<?php print $id; ?>"><?php print $doc["Title"]; ?></a>
                     </p>
