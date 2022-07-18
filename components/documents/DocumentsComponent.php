@@ -27,6 +27,8 @@ class DocumentsComponent extends Presentation\Component {
 	public function __construct($name) {
 		
 		parent::__construct($name);
+
+		var_dump($name);exit;
 		$this->template = "form";
 
 		$input = $this->getInput();

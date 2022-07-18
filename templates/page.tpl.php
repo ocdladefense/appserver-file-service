@@ -11,7 +11,7 @@
     <?php print $myDocs; ?>
     <?php /** Convert $myDocs html to a component call.**/?>
     <?php 
-        // component("DocumentTable", "my-documents", array("targetObjectIds" => []));
+        //component("DocumentTable", "my-documents", array("targetObjectIds" => []));
     ?>
     
 

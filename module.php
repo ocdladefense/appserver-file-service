@@ -69,6 +69,28 @@ class FileServiceModule extends Module
 		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 
 
+		$tpl = new Template("my-documents");
+		$tpl->addPath(__DIR__ . "/templates");
+		$myDocsHTML = $tpl->render([
+			"documents"		=> $service->getMyDocuments(),
+			"contactUrl"	=> $salesforceUrl
+		]);
+
+
+		$tpl = new Template("shared-with-me");
+		$tpl->addPath(__DIR__ . "/templates");
+		$sharedDocsHTML = $tpl->render(["documents" => $service->getDocumentsSharedWithMe()]);
+
+
+		$tpl = new Template("page");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render([
+			"myDocs"			=> $myDocsHTML,
+			"sharedWithMeDocs"	=> $sharedDocsHTML
+		]);
+
+
 
 		// This will be the new template call.  Then template call to list, below, can be removed after we've finished the page template.
 		// Page should call my-docs and shared-docs template files from inside it.
