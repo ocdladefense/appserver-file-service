@@ -1,20 +1,5 @@
 <?php
 
-use Mysql\Database;
-use Http\HttpRequest;
-use Http\HttpHeader;
-use Mysql\DbHelper;
-use Mysql\QueryBuilder;
-use Http\HttpHeaderCollection;
-use GIS\Political\Countries\US\Oregon;
-use Ocdla\Date;
-
-use function Html\createDataListElement;
-use function Html\createSelectElement;
-
-
-
-
 class DocumentsComponent extends Presentation\Component {
 
 
@@ -29,6 +14,8 @@ class DocumentsComponent extends Presentation\Component {
 		parent::__construct($name);
 
 		$this->template = $tplName;
+
+		$this->params = $params;
 
 		$input = $this->getInput();
 	}
@@ -77,6 +64,8 @@ class DocumentsComponent extends Presentation\Component {
 
 		
 		$service->loadAvailableDocuments();
+
+
 
 		$docs = $this->template == "my-documents" ? $service->getMyDocuments() : $service->getDocumentsSharedWithMe();
 
