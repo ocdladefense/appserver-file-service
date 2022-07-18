@@ -8,17 +8,17 @@
 
 
 
-    <?php print $myDocs; ?>
+    <?php //print $myDocs; ?>
     <?php /** Convert $myDocs html to a component call.**/?>
     <?php 
-        //component("DocumentTable", "my-documents", array("targetObjectIds" => []));
+        component("DocumentsComponent", "my-documents", array("targetObjectIds" => []));
     ?>
     
-
-    <?php print $sharedWithMeDocs; ?>
+    
+    <?php //print $sharedWithMeDocs; ?>
     <?php /** Convert $sharedWithMeDocs html to a component call.**/?>
     <?php 
-        // component("DocumentTable", "shared-documents", array("targetObjectIds" => []));
+        component("DocumentsComponent", "shared-with-me", array("targetObjectIds" => []));
     ?>
 
 </div>

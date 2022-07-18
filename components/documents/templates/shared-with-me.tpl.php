@@ -3,7 +3,7 @@
  * Template to render documents shared with me (not uploaded by me.)
  */
 ?>
-<div>
+<div class="doc-list">
     <h2>Documents Shared With Me</h2>
 
     <div class="table">

@@ -4,7 +4,7 @@
  * 
  */
 ?>
-<div>
+<div class="doc-list">
         <h2 style="display:inline; margin-right:15px;">My Documents</h2>
 
         <?php if(current_user()->isAdmin()): ?>

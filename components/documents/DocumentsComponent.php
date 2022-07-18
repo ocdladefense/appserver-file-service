@@ -24,12 +24,13 @@ class DocumentsComponent extends Presentation\Component {
 
 
 
-	public function __construct($name) {
+	public function __construct($name, $tplName, $params) {
 		
 		parent::__construct($name);
 
-		var_dump($name);exit;
-		$this->template = "form";
+		$this->template = $tplName;
+
+		// var_dump($tplName, $this->template);exit;
 
 		$input = $this->getInput();
 	}
@@ -55,33 +56,42 @@ class DocumentsComponent extends Presentation\Component {
 	 */
 	public function toHtml($params = array()) {
 
+		$api = loadApi();
+
 		$contactId = current_user()->getContactId();
-		//$contactId = "0035b00002fonLKAAY";
 
 		$service = FileService::fromUser(current_user());
-		$sharing = $service->getSharePoints();
 
-		array_shift($sharing);
+		// Possible sharing targets for the current user.
+		// These usually include the contactId, accountId and any committeeIds.
+		$sharePoints = $service->getSharePoints();
 
-
-		// Doing this for now!  Not really sure how Im going to deal with this yet.
-		// Gonna probably want to remove the contact id from the sharing array.  don't need it in the sharing here anymore.
-		// Now just gotta figure out how to not need it in the sharing array in the list function either.
-		$sharing = array_filter($sharing, function($item){
-
-			return $item !== "Me";
-		});
+		// The actual shared documents.
+		$targets = $service->getSharingTargets();
 
 
+		// If no documents, then display accordingly.
+		if($targets->count() == 0) {
+			$tpl = new Template("no-records");
+			$tpl->addPath(__DIR__ . "/templates");
+			return $tpl;
+		}
+
+		
+		$service->loadAvailableDocuments();
+		// var_dump($service->getDocumentsSharedWithMe());exit;
+
+		$docs = $this->template == "my-documents" ? $service->getMyDocuments() : $service->getDocumentsSharedWithMe();
+
+		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
+
+		//var_dump($this->template);exit;
 
 		// Template depends on the params that get passed into this function; or maybe the $id value that is passed into the "component()" function call.
-		$tpl = new Template("my-documents");
+		$tpl = new Template($this->template);
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render([
-			"sharing"		=> $sharing,
-			"contactId"		=> $contactId
-		]);
+		return $tpl->render(["documents" => $docs, "contactUrl" => $salesforceUrl]);
 	}
 
 
