@@ -4,7 +4,7 @@
 	"description": "Upload files as attachments for sObjects.",
 	"connectedApp": "default",
 	"files": ["FileService.php"],
-	"components": ["upload"],
+	"components": ["upload", "documents"],
 	"links":[
 		{
         	"href":"/file/upload",

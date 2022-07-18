@@ -28,6 +28,74 @@ class FileServiceModule extends Module
 	
 
 
+
+
+
+	public function list($list = null) {
+
+
+		$api = loadApi();
+
+		$contactId = current_user()->getContactId();
+
+
+
+		$service = FileService::fromUser(current_user());
+
+		// Possible sharing targets for the current user.
+		// These usually include the contactId, accountId and any committeeIds.
+		$sharePoints = $service->getSharePoints();
+
+
+
+		// The actual shared documents.
+		$targets = $service->getSharingTargets();
+
+
+		// If no documents, then display accordingly.
+		if($targets->count() == 0) {
+			$tpl = new Template("no-records");
+			$tpl->addPath(__DIR__ . "/templates");
+			return $tpl;
+		}
+
+		
+		
+
+
+		$service->loadAvailableDocuments();
+		// var_dump($service->getDocumentsSharedWithMe());exit;
+
+		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
+
+
+
+		// This will be the new template call.  Then template call to list, below, can be removed after we've finished the page template.
+		// Page should call my-docs and shared-docs template files from inside it.
+		/* $tpl = new Template("page");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render([
+			"myDocuments"		=> $service->getMyDocuments(),
+			"sharedDocuments"	=> $service->getDocumentsSharedWithMe(),
+			"contactUrl"		=> $salesforceUrl
+		]);
+		*/
+
+
+		$tpl = new Template("list");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render([
+			"myDocuments"		=> $service->getMyDocuments(),
+			"sharedDocuments"	=> $service->getDocumentsSharedWithMe(),
+			"contactUrl"		=> $salesforceUrl
+		]);
+	}
+
+
+
+
 	public function upload(){
 
 		$linkedEntityIds = $this->getRequest()->getBody()->linkedEntityIds;
@@ -87,55 +155,6 @@ class FileServiceModule extends Module
 		$id = $resp->getBody()["id"];
 
 		return redirect("/file/list");
-	}
-
-
-
-	public function list($list = null) {
-
-
-		$api = loadApi();
-
-		$contactId = current_user()->getContactId();
-
-
-
-		$service = FileService::fromUser(current_user());
-
-		// Possible sharing targets for the current user.
-		// These usually include the contactId, accountId and any committeeIds.
-		$sharePoints = $service->getSharePoints();
-
-
-
-		// The actual shared documents.
-		$targets = $service->getSharingTargets();
-
-
-		// If no documents, then display accordingly.
-		if($targets->count() == 0) {
-			$tpl = new Template("no-records");
-			$tpl->addPath(__DIR__ . "/templates");
-			return $tpl;
-		}
-
-		
-		
-
-
-		$service->loadAvailableDocuments();
-		// var_dump($service->getDocumentsSharedWithMe());exit;
-
-		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
-
-		$tpl = new Template("list");
-		$tpl->addPath(__DIR__ . "/templates");
-
-		return $tpl->render([
-			"myDocuments"		=> $service->getMyDocuments(),
-			"sharedDocuments"	=> $service->getDocumentsSharedWithMe(),
-			"contactUrl"		=> $salesforceUrl
-		]);
 	}
 
 
