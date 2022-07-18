@@ -37,16 +37,16 @@ class DocumentsComponent extends Presentation\Component {
 
 
     public function getStyles() {
-		return array();
+		//return array();
         return array(
             "active" => true,
-            "href" => module_path() . "/components/search/main.css?bust=001"
+            "href" => module_path() . "/components/documents/main.css?bust=001"
         );
     }
 
     public function getScripts() {
         return array(
-            "src" => module_path() . "/components/search/main.js?bust=001"
+            "src" => module_path() . "/components/documents/main.js?bust=001"
         );
     }
 
@@ -79,7 +79,6 @@ class DocumentsComponent extends Presentation\Component {
 
 		
 		$service->loadAvailableDocuments();
-		// var_dump($service->getDocumentsSharedWithMe());exit;
 
 		$docs = $this->template == "my-documents" ? $service->getMyDocuments() : $service->getDocumentsSharedWithMe();
 

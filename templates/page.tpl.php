@@ -6,19 +6,8 @@
 
 <div class="container">
 
-
-
-    <?php //print $myDocs; ?>
-    <?php /** Convert $myDocs html to a component call.**/?>
-    <?php 
-        component("DocumentsComponent", "my-documents", array("targetObjectIds" => []));
-    ?>
+    <?php component("DocumentsComponent", "my-documents", array("targetObjectIds" => [])); ?>
     
-    
-    <?php //print $sharedWithMeDocs; ?>
-    <?php /** Convert $sharedWithMeDocs html to a component call.**/?>
-    <?php 
-        component("DocumentsComponent", "shared-with-me", array("targetObjectIds" => []));
-    ?>
+    <?php component("DocumentsComponent", "shared-with-me", array("targetObjectIds" => [])); ?>
 
 </div>
