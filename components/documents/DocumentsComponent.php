@@ -30,14 +30,11 @@ class DocumentsComponent extends Presentation\Component {
 
 		$this->template = $tplName;
 
-		// var_dump($tplName, $this->template);exit;
-
 		$input = $this->getInput();
 	}
 
 
     public function getStyles() {
-		//return array();
         return array(
             "active" => true,
             "href" => module_path() . "/components/documents/main.css?bust=001"
@@ -68,6 +65,7 @@ class DocumentsComponent extends Presentation\Component {
 
 		// The actual shared documents.
 		$targets = $service->getSharingTargets();
+
 
 
 		// If no documents, then display accordingly.
