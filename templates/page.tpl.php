@@ -6,8 +6,13 @@
 
 <div class="container">
 
-    <?php component("DocumentsComponent", "my-documents", array("targetObjectIds" => [])); ?>
-    
-    <?php component("DocumentsComponent", "shared-with-me", array("targetObjectIds" => [])); ?>
 
+    <?php
+        component("DocumentsComponent", array(
+            "id"        => "shared-with-me",
+            "sharing"   => $sharePoints
+        ));
+    ?>
+
+    
 </div>

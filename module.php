@@ -27,12 +27,20 @@ class FileServiceModule extends Module
 
 
 
-	public function list($list = null) {
+	public function list($target = null) {
 
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render();
+		
+		if(null == $target) {
+			$user = current_user();
+			$sharing = FileService::getUserSharePoints($user);
+		} else {
+			$sharing = is_array($target) ? $target : array($target);
+		}
+
+		return $tpl->render(array("sharePoints" => $sharing));
 	}
 
 

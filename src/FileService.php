@@ -21,10 +21,22 @@ class FileService {
 
 
 
+
+	public function __construct($sharePoints = array()) {
+
+		$this->sharePoints = $sharePoints;
+	}
+
+
 	// Add a "share point" i.e., a LinkedEntityId that
 	// can be used to query the ContentDocumentLink table.
 	public function addSharePoint($id, $name) {
 		$this->sharePoints[$id] = $name;
+	}
+
+
+	public function addSharePoints($sharing) {
+		$this->sharePoints = $sharing;
 	}
 
 
@@ -148,23 +160,25 @@ class FileService {
 		// Key the result by the document Id.
 		$docs = $result->key("Id");
 
+		return $docs;
 		// Return an array of ContentDocumentLink records that is keyed by ContentDocumentId;
-		// in other words, same keys as $doc, above.
-		// $owners = self::getOwners($docs);
+		// In other words, same keys as $doc, above.
 		$sharePoints = $this->getSharePoints();
 		$contactId = $this->getContactId();
 
+
+		$cb = function($carry, $share) use ($sharePoints, $contactId){
+			$prev = $carry ?? "";
+			$linkId = $share["LinkedEntityId"];
+			$current = $sharePoints[$linkId];
+
+			if($linkId == $contactId) return $prev;
+
+			return empty($prev) ? $current : ($prev . ", " . $current);
+		};
+
+
 		foreach($groups as $docId => $sharing)  {
-
-			$cb = function($carry, $share) use ($sharePoints, $contactId){
-				$prev = $carry ?? "";
-				$linkId = $share["LinkedEntityId"];
-				$current = $sharePoints[$linkId];
-
-				if($linkId == $contactId) return $prev;
-
-				return empty($prev) ? $current : ($prev . ", " . $current);
-			};
 
 			$targetNames = array_reduce($sharing, $cb);
 
@@ -191,7 +205,7 @@ class FileService {
 
 		}
 
-		$this->includeUploadedBy();
+		// $this->includeUploadedBy();
 	}
 
 
@@ -204,6 +218,11 @@ class FileService {
 	public function getDocumentsSharedWithMe() {
 
 		return $this->sharedWithMe;
+	}
+
+	public function getDocuments() {
+
+		return $this->loadAvailableDocuments();
 	}
 
 
@@ -229,25 +248,23 @@ class FileService {
 	}
 
 
+	public static function getUserSharePoints($user) {
 
-	public static function fromUser($user) {
+		// This will be returned.
+		$sharing = array();
 
 		$api = loadApi(); // global 
 
-		
-		$service = new FileService();
-
 		$contactId = $user->getContactId();
-		$service->setContactId($contactId);
 		$accountId = $user->query("Contact.AccountId");
 		$accountName = $user->query("Account.Name");
 
 		if(null != $contactId) {
-			$service->addSharePoint($contactId, "Me");
+			$sharing[$contactId] = "Me";
 		}
 
 		if(null != $accountId) {
-			$service->addSharePoint($accountId, "Others in {$accountName}");
+			$sharing[$accountId] = "Others in {$accountName}";
 		}
 
 
@@ -266,8 +283,23 @@ class FileService {
 		foreach($records as $rel) {
 			$id 			= $rel["Committee__c"];
 			$name 			= $rel["Committee__r"]["Name"];
-			$service->addSharePoint($id, $name);
+			$sharing[$id] 	= $name;
 		}
+
+		return $sharing;
+	}
+
+
+
+	public static function fromUser($user) {
+		
+		$service = new FileService();
+
+		$contactId = $user->getContactId();
+		$service->setContactId($contactId);
+
+		$sharing = self::getCurrentUserSharePoints($user);
+		$service->addSharePoints($sharing);
 
 		return $service;
 	}

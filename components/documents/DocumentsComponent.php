@@ -9,15 +9,11 @@ class DocumentsComponent extends Presentation\Component {
 
 
 
-	public function __construct($name, $tplName, $params) {
+	public function __construct($name, $params) {
 		
-		parent::__construct($name);
+		parent::__construct($name, $params);	
 
-		$this->template = $tplName;
-
-		$this->params = $params;
-
-		$input = $this->getInput();
+		// $input = $this->getInput();
 	}
 
 
@@ -40,15 +36,22 @@ class DocumentsComponent extends Presentation\Component {
 	 */
 	public function toHtml($params = array()) {
 
-		$api = loadApi();
+		$user = current_user();
+		$contactId = $user->getContactId();
 
-		$contactId = current_user()->getContactId();
 
-		$service = FileService::fromUser(current_user());
+		if(true) {
+			$sharing = FileService::getUserSharePoints($user);
+		} else {
+			$sharing = $params;
+		}
+
+		$service = new FileService($sharing);
+		$service->setContactId($contactId);
 
 		// Possible sharing targets for the current user.
 		// These usually include the contactId, accountId and any committeeIds.
-		$sharePoints = $service->getSharePoints();
+		// $sharePoints = $service->getSharePoints();
 
 		// The actual shared documents.
 		$targets = $service->getSharingTargets();
@@ -66,15 +69,18 @@ class DocumentsComponent extends Presentation\Component {
 		$service->loadAvailableDocuments();
 
 
+		$docs = $service->getDocuments();
 
-		$docs = $this->template == "my-documents" ? $service->getMyDocuments() : $service->getDocumentsSharedWithMe();
+		/*
+		$docs = $this->template == "my-documents" ?
+			$service->getMyDocuments() : 
+			$service->getDocumentsSharedWithMe();
+		*/
 
 		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 
-		//var_dump($this->template);exit;
-
 		// Template depends on the params that get passed into this function; or maybe the $id value that is passed into the "component()" function call.
-		$tpl = new Template($this->template);
+		$tpl = new Template("documents");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render(["documents" => $docs, "contactUrl" => $salesforceUrl]);
