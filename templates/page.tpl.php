@@ -10,7 +10,7 @@
     <?php
         component("DocumentsComponent", array(
             "id"        => "shared-with-me",
-            "sharing"   => $sharePoints
+            "entity-data"   => $entityData
         ));
     ?>
 

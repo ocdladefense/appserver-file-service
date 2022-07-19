@@ -27,20 +27,28 @@ class FileServiceModule extends Module
 
 
 
-	public function list($target = null) {
+	public function list($entityId = null) {
+
+		//$entityId = "a2G5b000000OpoMEAS";
 
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		
-		if(null == $target) {
+		if(null == $entityId) {
 			$user = current_user();
-			$sharing = FileService::getUserSharePoints($user);
+			$entityData = FileService::getUserSharePoints($user);
 		} else {
-			$sharing = is_array($target) ? $target : array($target);
+			$entityIds = is_array($entityId) ? $entityId : array($entityId);
+
+			$entityData = [];
+			foreach($entityIds as $id) {
+
+				$entityData[$id] = FileService::getEntityName($id);
+			}
 		}
 
-		return $tpl->render(array("sharePoints" => $sharing));
+		return $tpl->render(array("entityData" => $entityData));
 	}
 
 

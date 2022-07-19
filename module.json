@@ -32,7 +32,7 @@
             "access":"is_authenticated",
             "authorization":"webserver"
 		},
-		"file/list/%listName": {
+		"file/list/%entityId": {
 			"callback":"list",
 			"content-type":"text/html"
 		},

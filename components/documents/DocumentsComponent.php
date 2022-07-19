@@ -11,9 +11,10 @@ class DocumentsComponent extends Presentation\Component {
 
 	public function __construct($name, $params) {
 		
-		parent::__construct($name, $params);	
+		parent::__construct($name, $params);
 
-		// $input = $this->getInput();
+		// Need to figure out why the params are not being passed to the "toHtml" function.
+		$this->params = $params;
 	}
 
 
@@ -36,40 +37,47 @@ class DocumentsComponent extends Presentation\Component {
 	 */
 	public function toHtml($params = array()) {
 
-		$user = current_user();
-		$contactId = $user->getContactId();
+		// An associative array of entity aliases keyed by entity ids.
+		$linkedEnitys = $this->params["entity-data"];
 
+		$service = new FileService($linkedEnitys);
 
-		if(true) {
-			$sharing = FileService::getUserSharePoints($user);
-		} else {
-			$sharing = $params;
+		$docs = $service->getDocuments();
+
+		//If no documents, then display accordingly.
+		if(count($docs) == 0) {
+			$tpl = new Template("no-records");
+			$tpl->addPath(__DIR__ . "/templates");
+			return $tpl;
 		}
 
-		$service = new FileService($sharing);
-		$service->setContactId($contactId);
+		$tpl = new Template("documents");
+		$tpl->addPath(__DIR__ . "/templates");
+
+		return $tpl->render(["documents" => $docs]);
+
+
+
+
+		
+		//$service->setContactId($contactId);
 
 		// Possible sharing targets for the current user.
 		// These usually include the contactId, accountId and any committeeIds.
 		// $sharePoints = $service->getSharePoints();
 
 		// The actual shared documents.
-		$targets = $service->getSharingTargets();
+		//$targets = $service->getSharingTargets();
 
 
 
-		// If no documents, then display accordingly.
-		if($targets->count() == 0) {
-			$tpl = new Template("no-records");
-			$tpl->addPath(__DIR__ . "/templates");
-			return $tpl;
-		}
+
 
 		
-		$service->loadAvailableDocuments();
+		//$service->loadAvailableDocuments();
 
 
-		$docs = $service->getDocuments();
+
 
 		/*
 		$docs = $this->template == "my-documents" ?
@@ -77,13 +85,13 @@ class DocumentsComponent extends Presentation\Component {
 			$service->getDocumentsSharedWithMe();
 		*/
 
-		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
+		//$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
 
 		// Template depends on the params that get passed into this function; or maybe the $id value that is passed into the "component()" function call.
-		$tpl = new Template("documents");
-		$tpl->addPath(__DIR__ . "/templates");
+		// $tpl = new Template("documents");
+		// $tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["documents" => $docs, "contactUrl" => $salesforceUrl]);
+		// return $tpl->render(["documents" => $docs, "contactUrl" => $salesforceUrl]);
 	}
 
 

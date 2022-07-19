@@ -4,7 +4,6 @@
  */
 ?>
 <div class="doc-list">
-    <h2>Documents Shared With Me</h2>
 
     <div class="table">
         <div class="table-row first">

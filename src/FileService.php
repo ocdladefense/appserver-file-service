@@ -55,6 +55,74 @@ class FileService {
 	}
 
 
+	public static function getUserSharePoints($user) {
+
+		// This will be returned.
+		$sharing = array();
+
+		$api = loadApi(); // global 
+
+		$contactId = $user->getContactId();
+		$accountId = $user->query("Contact.AccountId");
+		$accountName = $user->query("Account.Name");
+
+		if(null != $contactId) {
+			$sharing[$contactId] = "Me";
+		}
+
+		if(null != $accountId) {
+			$sharing[$accountId] = "Others in {$accountName}";
+		}
+
+
+
+		$format = "SELECT Committee__c, Committee__r.Name FROM Relationship__c WHERE Contact__c = '%s'";
+
+		$query = sprintf($format, $contactId);
+
+		$result = $api->query($query);
+
+		$records = $result->getRecords();
+
+
+
+
+		foreach($records as $rel) {
+			$id 			= $rel["Committee__c"];
+			$name 			= $rel["Committee__r"]["Name"];
+			$sharing[$id] 	= $name;
+		}
+
+		return $sharing;
+	}
+
+
+	public static function getEntityName($id) {
+
+		$sObjectType = self::getSobjectType($id);
+		$query = "SELECT Name FROM $sObjectType WHERE Id = '$id'";
+		
+		return loadApi()->query($query)->getRecord()["Name"];
+	}
+
+	
+	public static function getSobjectType($id) {
+
+		$prefix = substr($id, 0, 3);
+
+		switch ($prefix) {
+			case 'a2G':
+				return "Committee__c";
+				break;
+			
+			default:
+				throw new Exception("NO SOBJECT TYPE FOUND FOR PREFIX $prefix");
+				break;
+		}
+
+		var_dump($prefix, $id);exit;
+	}
+
 
 
 
@@ -124,7 +192,7 @@ class FileService {
 	}
 
 
-	public function loadAvailableDocuments() {
+	public function getDocuments() {
 
 
 		$api = loadApi();
@@ -161,6 +229,10 @@ class FileService {
 		$docs = $result->key("Id");
 
 		return $docs;
+
+	}
+
+	public function foobar() {
 		// Return an array of ContentDocumentLink records that is keyed by ContentDocumentId;
 		// In other words, same keys as $doc, above.
 		$sharePoints = $this->getSharePoints();
@@ -220,11 +292,6 @@ class FileService {
 		return $this->sharedWithMe;
 	}
 
-	public function getDocuments() {
-
-		return $this->loadAvailableDocuments();
-	}
-
 
 
 
@@ -245,48 +312,6 @@ class FileService {
 		$file->setType($resp->getHeader("Content-Type"));
 
 		return $file;
-	}
-
-
-	public static function getUserSharePoints($user) {
-
-		// This will be returned.
-		$sharing = array();
-
-		$api = loadApi(); // global 
-
-		$contactId = $user->getContactId();
-		$accountId = $user->query("Contact.AccountId");
-		$accountName = $user->query("Account.Name");
-
-		if(null != $contactId) {
-			$sharing[$contactId] = "Me";
-		}
-
-		if(null != $accountId) {
-			$sharing[$accountId] = "Others in {$accountName}";
-		}
-
-
-
-		$format = "SELECT Committee__c, Committee__r.Name FROM Relationship__c WHERE Contact__c = '%s'";
-
-		$query = sprintf($format, $contactId);
-
-		$result = $api->query($query);
-
-		$records = $result->getRecords();
-
-
-
-
-		foreach($records as $rel) {
-			$id 			= $rel["Committee__c"];
-			$name 			= $rel["Committee__r"]["Name"];
-			$sharing[$id] 	= $name;
-		}
-
-		return $sharing;
 	}
 
 
