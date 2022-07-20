@@ -15,7 +15,9 @@
             <p class="table-header">Type</p>
             <p class="table-header">Size</p>
             <p class="table-header">Download</p>
-            <p class="table-header"></p>
+            <?php if($isMyDocs): ?>
+                <p class="table-header">Delete</p>
+            <?php endif; ?>
         </div>
 
 
@@ -62,7 +64,13 @@
                     </a>
                 </p>
 
-                <p class="table-cell"></p>
+                <?php if($isMyDocs) : ?>
+                    <p class="table-cell icon-cell">
+                        <a href="/file/delete/<?php print $id; ?>">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </p>
+                <?php endif; ?>
 
             </div>
         

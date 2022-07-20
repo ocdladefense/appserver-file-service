@@ -40,11 +40,15 @@ class DocumentsComponent extends Presentation\Component {
 		// An associative array of entity aliases keyed by entity ids.
 		$entityData = $this->params["entity-data"];
 		$entityId = array_keys($entityData)[0];
+		$isMyDocs = false;
 
 		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$entityId/related/CombinedAttachments/view";
 
+
+		// Set up the title with a link to the entities documents on salesforce.
 		if(current_user()->getContactId() == $entityId) {
-			$title = "My Documents " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
+			$title = "My Documents - " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
+			$isMyDocs = true;
 		} else {
 			$title = "Documents Shared with ". 
 			"<a href='$salesforceUrl' target='_blank'>"
@@ -66,44 +70,11 @@ class DocumentsComponent extends Presentation\Component {
 		$tpl = new Template("documents");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["documents" => $docs, "title" => $title]);
-
-
-
-
-		
-		//$service->setContactId($contactId);
-
-		// Possible sharing targets for the current user.
-		// These usually include the contactId, accountId and any committeeIds.
-		// $sharePoints = $service->getSharePoints();
-
-		// The actual shared documents.
-		//$targets = $service->getSharingTargets();
-
-
-
-
-
-		
-		//$service->loadAvailableDocuments();
-
-
-
-
-		/*
-		$docs = $this->template == "my-documents" ?
-			$service->getMyDocuments() : 
-			$service->getDocumentsSharedWithMe();
-		*/
-
-		//$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$contactId/related/CombinedAttachments/view";
-
-		// Template depends on the params that get passed into this function; or maybe the $id value that is passed into the "component()" function call.
-		// $tpl = new Template("documents");
-		// $tpl->addPath(__DIR__ . "/templates");
-
-		// return $tpl->render(["documents" => $docs, "contactUrl" => $salesforceUrl]);
+		return $tpl->render([
+			"documents" => $docs,
+			"title" => $title,
+			"isMyDocs" => $isMyDocs
+		]);
 	}
 
 

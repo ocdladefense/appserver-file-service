@@ -11,8 +11,7 @@
     <?php
         foreach($entityData as $id => $title) {
             component("DocumentsComponent", array(
-                "entity-data"   => [$id => $title],
-                "title" => $title
+                "entity-data"   => [$id => $title]
             ));
         }
     ?>
