@@ -121,6 +121,9 @@ class FileService {
 			case '003':
 				return "Contact";
 				break;
+			case '001':
+				return "Account";
+				break;
 			default:
 				throw new Exception("NO SOBJECT TYPE FOUND FOR PREFIX $prefix");
 				break;

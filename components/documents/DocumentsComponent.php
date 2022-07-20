@@ -38,9 +38,21 @@ class DocumentsComponent extends Presentation\Component {
 	public function toHtml($params = array()) {
 
 		// An associative array of entity aliases keyed by entity ids.
-		$linkedEntities = $this->params["entity-data"];
+		$entityData = $this->params["entity-data"];
+		$entityId = array_keys($entityData)[0];
 
-		$service = new FileService($linkedEntities);
+		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$entityId/related/CombinedAttachments/view";
+
+		if(current_user()->getContactId() == $entityId) {
+			$title = "My Documents " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
+		} else {
+			$title = "Documents Shared with ". 
+			"<a href='$salesforceUrl' target='_blank'>"
+			.FileService::getEntityName($entityId)." ".trim(FileService::getSobjectType($entityId), "__c").
+			"</a>   members.";
+		}
+
+		$service = new FileService($entityData);
 
 		$docs = $service->getDocuments();
 
@@ -54,7 +66,7 @@ class DocumentsComponent extends Presentation\Component {
 		$tpl = new Template("documents");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		return $tpl->render(["documents" => $docs]);
+		return $tpl->render(["documents" => $docs, "title" => $title]);
 
 
 

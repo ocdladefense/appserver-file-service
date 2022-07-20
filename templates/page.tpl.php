@@ -9,10 +9,12 @@
 
     <!-- My Documents -->
     <?php
-        component("DocumentsComponent", array(
-            "entity-data"   => $entityData,
-            "title" => $title
-        ));
+        foreach($entityData as $id => $title) {
+            component("DocumentsComponent", array(
+                "entity-data"   => [$id => $title],
+                "title" => $title
+            ));
+        }
     ?>
 <!-- 
     <?php
