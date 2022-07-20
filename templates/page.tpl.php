@@ -7,12 +7,31 @@
 <div class="container">
 
 
+    <!-- My Documents -->
     <?php
         component("DocumentsComponent", array(
-            "id"        => "shared-with-me",
-            "entity-data"   => $entityData
+            "entity-data"   => $entityData,
+            "title" => $title
         ));
     ?>
+<!-- 
+    <?php
+        // component("DocumentsComponent", array(
+        //     "id"        => "shared-with-me",
+        //     "entity-data"   => $entityData,
+        //     "title" => $title
+        // ));
+    ?>
+
+
+    <?php
+        // component("DocumentsComponent", array(
+        //     "id"        => "shared-with-me",
+        //     "entity-data"   => $entityData,
+        //     "title" => $title
+        // ));
+    ?> 
+    
 
     
 </div>

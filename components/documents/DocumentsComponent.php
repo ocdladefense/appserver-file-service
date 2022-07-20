@@ -38,9 +38,9 @@ class DocumentsComponent extends Presentation\Component {
 	public function toHtml($params = array()) {
 
 		// An associative array of entity aliases keyed by entity ids.
-		$linkedEnitys = $this->params["entity-data"];
+		$linkedEntities = $this->params["entity-data"];
 
-		$service = new FileService($linkedEnitys);
+		$service = new FileService($linkedEntities);
 
 		$docs = $service->getDocuments();
 

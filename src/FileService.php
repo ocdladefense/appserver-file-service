@@ -97,6 +97,7 @@ class FileService {
 	}
 
 
+	// I think we need this function in core.
 	public static function getEntityName($id) {
 
 		$sObjectType = self::getSobjectType($id);
@@ -105,7 +106,7 @@ class FileService {
 		return loadApi()->query($query)->getRecord()["Name"];
 	}
 
-	
+	// I think we need a more complete version of this function in core.
 	public static function getSobjectType($id) {
 
 		$prefix = substr($id, 0, 3);
@@ -114,7 +115,12 @@ class FileService {
 			case 'a2G':
 				return "Committee__c";
 				break;
-			
+			case '005':
+				return "User";
+				break;
+			case '003':
+				return "Contact";
+				break;
 			default:
 				throw new Exception("NO SOBJECT TYPE FOUND FOR PREFIX $prefix");
 				break;

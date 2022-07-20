@@ -30,6 +30,7 @@ class FileServiceModule extends Module
 	public function list($entityId = null) {
 
 		//$entityId = "a2G5b000000OpoMEAS";
+		//$entityId = current_user()->getContactId();
 
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
@@ -48,6 +49,10 @@ class FileServiceModule extends Module
 			}
 		}
 
+
+		//var_dump($entityData);exit;
+
+		// The entityData is a associative array of aliases keyed by entity id.
 		return $tpl->render(array("entityData" => $entityData));
 	}
 
