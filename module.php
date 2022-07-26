@@ -29,16 +29,22 @@ class FileServiceModule extends Module
 
 	public function list($entityId = null) {
 
-		//$entityId = "a2G5b000000OpoMEAS";
-		//$entityId = current_user()->getContactId();
+		// $webGovId = "a2G5b000000OpoMEAS";
+		// $contactId = current_user()->getContactId();
 
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
 
-		
+		$tables = array();
+
 		if(null == $entityId) {
 			$user = current_user();
-			$entityData = FileService::getUserSharePoints($user);
+			// $entityData = FileService::getUserSharePoints($user);
+			$table["title"] = "My Documents";
+			$table["linkedEntityIds"] = array($user->getContactId());
+
+			$tables []= $table;
+			
 		} else {
 			$entityIds = is_array($entityId) ? $entityId : array($entityId);
 
@@ -50,10 +56,24 @@ class FileServiceModule extends Module
 		}
 
 
-		//var_dump($entityData);exit;
+		/*
+		// Set up the title with a link to the entities documents on salesforce.
+		if(current_user()->getContactId() == $entityId) {
+			$title = "My Documents - " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
+			// $isMyDocs = true;
+		} else {
+			$title = "Documents Shared with ". 
+			"<a href='$salesforceUrl' target='_blank'>"
+			.FileService::getEntityName($entityId)." ".trim(FileService::getSobjectType($entityId), "__c").
+			"</a>   members.";
+		}
+		*/
+
+
+		// var_dump($entityData);exit;
 
 		// The entityData is a associative array of aliases keyed by entity id.
-		return $tpl->render(array("entityData" => $entityData));
+		return $tpl->render(array("tables" => $tables));
 	}
 
 

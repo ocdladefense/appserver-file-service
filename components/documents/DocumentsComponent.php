@@ -38,23 +38,18 @@ class DocumentsComponent extends Presentation\Component {
 	public function toHtml($params = array()) {
 
 		// An associative array of entity aliases keyed by entity ids.
-		$entityData = $this->params["entity-data"];
-		$entityId = array_keys($entityData)[0];
-		$isMyDocs = false;
-
-		$salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$entityId/related/CombinedAttachments/view";
+		$entityData = $this->params["linkedEntityIds"];
+		$title = $this->params["title"];
 
 
-		// Set up the title with a link to the entities documents on salesforce.
-		if(current_user()->getContactId() == $entityId) {
-			$title = "My Documents - " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
-			$isMyDocs = true;
-		} else {
-			$title = "Documents Shared with ". 
-			"<a href='$salesforceUrl' target='_blank'>"
-			.FileService::getEntityName($entityId)." ".trim(FileService::getSobjectType($entityId), "__c").
-			"</a>   members.";
-		}
+		// Only useful if the table contains docs for a *single linkedEntityId.
+		// I.e., we are currently only generating one $salesforceUrl, below.
+		// $entityId = array_keys($entityData)[0];
+
+		// $salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$entityId/related/CombinedAttachments/view";
+
+
+
 
 		$service = new FileService($entityData);
 
@@ -71,9 +66,9 @@ class DocumentsComponent extends Presentation\Component {
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render([
-			"documents" => $docs,
-			"title" => $title,
-			"isMyDocs" => $isMyDocs
+			"documents" 	=> $docs,
+			"title" 		=> $title,
+			"isMyDocs" 		=> false
 		]);
 	}
 

@@ -9,28 +9,27 @@
 
     <!-- My Documents -->
     <?php
-        foreach($entityData as $id => $title) {
-            component("DocumentsComponent", array(
-                "entity-data"   => [$id => $title]
-            ));
-        }
-    ?>
-<!-- 
-    <?php
-        // component("DocumentsComponent", array(
-        //     "id"        => "shared-with-me",
-        //     "entity-data"   => $entityData,
-        //     "title" => $title
-        // ));
+
+        $table = $tables[0];
+
+        component("DocumentsComponent", $table);
+
     ?>
 
 
+    <!-- Account Documents -->
     <?php
-        // component("DocumentsComponent", array(
-        //     "id"        => "shared-with-me",
-        //     "entity-data"   => $entityData,
-        //     "title" => $title
-        // ));
+        $table = $tables[1];
+
+        component("DocumentsComponent", $table);
+    ?>
+
+
+    <!-- All Committee Documents (i.e., webgov) -->
+    <?php
+        $table = $tables[2];
+
+        component("DocumentsComponent", $table);
     ?> 
     
 

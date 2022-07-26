@@ -140,7 +140,8 @@ class FileService {
 	public function getSharingTargets() {
 
 		// Get the Ids only. Don't need the names to perform the query.
-		$targets = array_keys($this->sharePoints);
+		// $targets = array_keys($this->sharePoints);
+		$targets = $this->sharePoints;
 
 		$api = loadApi();
 
