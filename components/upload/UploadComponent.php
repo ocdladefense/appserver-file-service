@@ -55,7 +55,7 @@ class UploadComponent extends Presentation\Component {
 
 	public function toHtml($params = array()) {
 
-		//$contactId = current_user()->getContactId();
+		$contactId = current_user()->getContactId();
 		//$contactId = "0035b00002fonLKAAY"; // This is Trevor's Contact Id.
 
 		$linkedEntityIds = FileService::getUserAssociatedEntityIds();
