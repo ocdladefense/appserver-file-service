@@ -1,6 +1,7 @@
 <?php
 
 use Mysql\DbHelper;
+use Salesforce\ContentDocument;
 
 
 
@@ -43,11 +44,9 @@ class FileService {
 
 	public function getDocuments() {
 
-		// Get the ContentDocument data as an associative array, keyed by the ContentDocumentId.
+		// Get the ContentDocumentLinks with all of the ContentDocument data.
 		$format = "SELECT Id, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileType, ContentDocument.FileExtension, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
-
 		$query = DbHelper::parseArray($format, $this->linkedEntityIds);
-
 		$resp = loadApi()->query($query);
 		
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
@@ -56,9 +55,10 @@ class FileService {
 
 		if($docs->count() == 0) return [];
 
-		// We only want linked entities that are contacts.
+		// All of the linked entities for all of the documents
 		$linkedEntities = $this->getLinkedEntities($docs);
 
+		// The owner data for the documents.  An array of contacts keyed by ContentDocumentIds.
 		$owners = $this->getOwners($linkedEntities);
 
 		// Need docs to be an array, not a private row.
@@ -70,7 +70,7 @@ class FileService {
 			$doc["ownerId"] = $owners[$id]["Id"];
 		}
 
-		return UploadedDocument::fromContentDocumentLinkQueryResult($docs);
+		return ContentDocument::fromContentDocumentLinkQueryResult($docs);
 	}
 
 
@@ -80,15 +80,14 @@ class FileService {
 		$ids = $linkedEntities->getField("LinkedEntityId");
 
 		$format = "SELECT Id, Name FROM Contact WHERE Id in (:array)";
-
 		$query = DbHelper::parseArray($format, $ids);
-
 		$resp = loadApi()->query($query);
 		
 		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
 
 		$contacts = $resp->getQueryResult()->key("Id");
 
+		// We only want the 
 		$contactEntities = array_filter($linkedEntities->getRecords(), function($entity){
 
 			return self::getSobjectType($entity["LinkedEntityId"]) == "Contact";
@@ -114,8 +113,6 @@ class FileService {
 		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId in (:array)";
 		$query = DbHelper::parseArray($format, $ids);
 		$links = loadApi()->query($query)->getQueryResult();
-
-		//var_dump($links);exit;
 
 		return $links;
 	}
