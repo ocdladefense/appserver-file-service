@@ -23,12 +23,17 @@
             
             <div class="table-row data">
 
-                <p class="table-cell">
-                    <a href="/directory/members/<?php print $doc->ownerId(); ?>">
-                        <?php print $doc->uploadedBy();?>
-                    </a>
-                </p>
-
+                <?php if(empty($doc->ownerId())) : ?>
+                    <p class="table-cell">
+                        <?php print $doc->uploadedBy(); ?>
+                    </p>
+                <?php else: ?>
+                    <p class="table-cell">
+                        <a href="/directory/members/<?php print $doc->ownerId(); ?>">
+                            <?php print $doc->uploadedBy();?>
+                        </a>
+                    </p>
+                <?php endif; ?>
 
                 <p class="table-cell">
                     <a href="/file/download/<?php print $id; ?>"><?php print $doc->title(); ?></a>
