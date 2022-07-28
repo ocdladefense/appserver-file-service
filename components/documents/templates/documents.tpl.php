@@ -36,7 +36,7 @@
                 <?php endif; ?>
 
                 <p class="table-cell">
-                    <a href="/file/download/<?php print $id; ?>"><?php print $doc->title(); ?></a>
+                    <a href="/file/download/<?php print $doc->id(); ?>"><?php print $doc->title(); ?></a>
                 </p>
 
                 <p class="table-cell">
