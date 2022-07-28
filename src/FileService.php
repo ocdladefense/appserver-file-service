@@ -3,11 +3,7 @@
 use Mysql\DbHelper;
 use Salesforce\ContentDocument;
 
-
-
 class FileService {
-
-
 
 	private $linkedEntityIds = array();
 
@@ -18,7 +14,7 @@ class FileService {
 	}
 
 
-
+	// Get the ids for the user's contact, account, and any committees the user is a member of.
 	public static function getUserAssociatedEntityIds($user = null) {
 
 		$user = empty($user) ? current_user() : $user;
@@ -42,6 +38,7 @@ class FileService {
 
 
 
+	// Return an array of "Salesforce\ContentDocument" objects.
 	public function getDocuments() {
 
 		// Get the ContentDocumentLinks with all of the ContentDocument data.
@@ -56,10 +53,10 @@ class FileService {
 		if($docs->count() == 0) return [];
 
 		// All of the linked entities for all of the documents
-		$linkedEntities = $this->getLinkedEntities($docs);
+		$documentLinks = $this->getDocumentLinks($docs);
 
 		// The owner data for the documents.  An array of contacts keyed by ContentDocumentIds.
-		$owners = $this->getOwners($linkedEntities);
+		$owners = $this->getOwners($documentLinks);
 
 		// Need docs to be an array, not a private row.
 		$docs = $docs->key("ContentDocumentId");
@@ -74,10 +71,10 @@ class FileService {
 	}
 
 
-	// Trying to get all the contacts that are linkedEntities for a given set of ContentDocumentLinks
-	public function getOwners($linkedEntities) {
+	// Return an associative array of contacts, keyed by the ContentDocumentIds.
+	public function getOwners($documentLinks) {
 
-		$ids = $linkedEntities->getField("LinkedEntityId");
+		$ids = $documentLinks->getField("LinkedEntityId");
 
 		$format = "SELECT Id, Name FROM Contact WHERE Id in (:array)";
 		$query = DbHelper::parseArray($format, $ids);
@@ -88,9 +85,9 @@ class FileService {
 		$contacts = $resp->getQueryResult()->key("Id");
 
 		// We only want the 
-		$contactEntities = array_filter($linkedEntities->getRecords(), function($entity){
+		$contactEntities = array_filter($documentLinks->getRecords(), function($link){
 
-			return self::getSobjectType($entity["LinkedEntityId"]) == "Contact";
+			return self::getSobjectType($link["LinkedEntityId"]) == "Contact";
 		});
 
 		$owners = [];
@@ -105,8 +102,8 @@ class FileService {
 	}
 
 
-	// Trying to figure out who owns the document
-	public function getLinkedEntities($docs) {
+	// Get all of the ContentDocumentLinks for all of the documents.
+	public function getDocumentLinks($docs) {
 
 		$ids = $docs->getField("ContentDocumentId");
 
