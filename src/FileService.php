@@ -45,74 +45,74 @@ class FileService {
 		$format = "SELECT Id, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileType, ContentDocument.FileExtension, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
 		$query = DbHelper::parseArray($format, $this->linkedEntityIds);
 		$resp = loadApi()->query($query);
-		
-		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
+	
+		$result = $resp->getQueryResult();
 
-		$docs = $resp->getQueryResult();
 
-		if($docs->count() == 0) return [];
+
+		if($result->count() == 0) return [];
+
+		$data = $result->group(function($link){ return $link["ContentDocumentId"];});
+		var_dump($data);
+
+		$ids = $result->getField("ContentDocumentId");
 
 		// All of the linked entities for all of the documents
-		$documentLinks = $this->getDocumentLinks($docs);
+		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId IN (:array)";
+		$query = DbHelper::parseArray($format, $ids);
+		$result = loadApi()->query($query)->getQueryResult();
 
+		$grouped = $result->group(function($link){ return $link["ContentDocumentId"];});
+
+		
+		var_dump($grouped);exit;
+		// return ContentDocument::fromContentDocumentLinkQueryResult($docs);
+		
 		// The owner data for the documents.  An array of contacts keyed by ContentDocumentIds.
-		$owners = $this->getOwners($documentLinks);
+		// $owners = $this->getOwners($links);
 
 		// Need docs to be an array, not a private row.
-		$docs = $docs->key("ContentDocumentId");
+		// $docs = $result->key("ContentDocumentId");
 
-		foreach($docs as $id => &$doc) {
+		$docs = array();
 
-			$doc["ownerName"] = $owners[$id]["Name"];
-			$doc["ownerId"] = $owners[$id]["Id"];
+
+		// It all got grouped by ContentDocumentId, above.
+		foreach($grouped as $id => $links) {
+			// These methods will need to be written.
+			$doc = new ContentDocument($id);
+			$doc->setDocumentData($data[$id]);
+			$doc->setLinkedEntities($links);
+			$docs []= $doc;
+			// $doc["ownerName"] = $owners[$id]["Name"];
+			// $doc["ownerId"] = $owners[$id]["Id"];
+
+			// $whoIsTheOwner = $doc->getOwnerId();
 		}
 
-		return ContentDocument::fromContentDocumentLinkQueryResult($docs);
+		// Decide whether to display the delete button or the edit button
+
+		
+		return $docs;
 	}
 
 
-	// Return an associative array of contacts, keyed by the ContentDocumentIds.
-	public function getOwners($documentLinks) {
 
-		$ids = $documentLinks->getField("LinkedEntityId");
-
-		$format = "SELECT Id, Name FROM Contact WHERE Id in (:array)";
-		$query = DbHelper::parseArray($format, $ids);
-		$resp = loadApi()->query($query);
-		
-		if(!$resp->success()) throw new Exception($resp->getErrorMessage());
-
-		$contacts = $resp->getQueryResult()->key("Id");
-
-		// We only want the 
-		$contactEntities = array_filter($documentLinks->getRecords(), function($link){
-
-			return self::getSobjectType($link["LinkedEntityId"]) == "Contact";
-		});
-
-		$owners = [];
-
-		foreach($contactEntities as $entity) {
-
-			$owners[$entity["ContentDocumentId"]] = $contacts[$entity["LinkedEntityId"]];
-		
-		}
-
-		return $owners;
-	}
 
 
 	// Get all of the ContentDocumentLinks for all of the documents.
-	public function getDocumentLinks($docs) {
+	public function getDocumentLinks($ids) {
 
-		$ids = $docs->getField("ContentDocumentId");
-
-		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId in (:array)";
+		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId IN (:array)";
 		$query = DbHelper::parseArray($format, $ids);
 		$links = loadApi()->query($query)->getQueryResult();
 
 		return $links;
 	}
+
+
+
+
 
 
 
