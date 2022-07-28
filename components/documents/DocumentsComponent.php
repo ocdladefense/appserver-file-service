@@ -37,21 +37,11 @@ class DocumentsComponent extends Presentation\Component {
 	 */
 	public function toHtml($params = array()) {
 
-		// An associative array of entity aliases keyed by entity ids.
-		$entityData = $this->params["linkedEntityIds"];
+		$entityIds = $this->params["linkedEntityIds"];
 		$title = $this->params["title"];
+		$link = $this->params["link"];
 
-
-		// Only useful if the table contains docs for a *single linkedEntityId.
-		// I.e., we are currently only generating one $salesforceUrl, below.
-		// $entityId = array_keys($entityData)[0];
-
-		// $salesforceUrl = cache_get("instance_url") . "/lightning/r/CombinedAttachment/$entityId/related/CombinedAttachments/view";
-
-
-
-
-		$service = new FileService($entityData);
+		$service = new FileService($entityIds);
 
 		$docs = $service->getDocuments();
 
@@ -68,7 +58,7 @@ class DocumentsComponent extends Presentation\Component {
 		return $tpl->render([
 			"documents" 	=> $docs,
 			"title" 		=> $title,
-			"isMyDocs" 		=> false
+			"link"			=> $link
 		]);
 	}
 

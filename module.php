@@ -30,7 +30,6 @@ class FileServiceModule extends Module
 	public function list($entityId = null) {
 
 		// $webGovId = "a2G5b000000OpoMEAS";
-		// $contactId = current_user()->getContactId();
 
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
@@ -38,41 +37,23 @@ class FileServiceModule extends Module
 		$tables = array();
 
 		if(null == $entityId) {
-			$user = current_user();
-			// $entityData = FileService::getUserSharePoints($user);
-			$table["title"] = "My Documents";
-			$table["linkedEntityIds"] = array($user->getContactId());
 
-			$tables []= $table;
+			$userAssociated = FileService::getUserAssociatedEntityIds();
+
+			foreach($userAssociated as $entityId) {
+
+				$table = [];
+				$table["linkedEntityIds"][] = $entityId;
+				$tables[] = $table;
+			}
 			
 		} else {
-			$entityIds = is_array($entityId) ? $entityId : array($entityId);
 
-			$entityData = [];
-			foreach($entityIds as $id) {
-
-				$entityData[$id] = FileService::getEntityName($id);
-			}
+			$table = [];
+			$table["linkedEntityIds"][] = $entityId;
+			$tables[] = $table;
 		}
 
-
-		/*
-		// Set up the title with a link to the entities documents on salesforce.
-		if(current_user()->getContactId() == $entityId) {
-			$title = "My Documents - " . "<a href='$salesforceUrl' target='_blank'>view on salesforce</a>";
-			// $isMyDocs = true;
-		} else {
-			$title = "Documents Shared with ". 
-			"<a href='$salesforceUrl' target='_blank'>"
-			.FileService::getEntityName($entityId)." ".trim(FileService::getSobjectType($entityId), "__c").
-			"</a>   members.";
-		}
-		*/
-
-
-		// var_dump($entityData);exit;
-
-		// The entityData is a associative array of aliases keyed by entity id.
 		return $tpl->render(array("tables" => $tables));
 	}
 
@@ -82,6 +63,10 @@ class FileServiceModule extends Module
 	public function upload(){
 
 		$linkedEntityIds = $this->getRequest()->getBody()->linkedEntityIds;
+
+		$linkedEntityIds = array_filter($linkedEntityIds);
+
+		var_dump($linkedEntityIds);
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 

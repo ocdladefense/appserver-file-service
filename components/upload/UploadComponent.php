@@ -55,29 +55,25 @@ class UploadComponent extends Presentation\Component {
 
 	public function toHtml($params = array()) {
 
-		$contactId = current_user()->getContactId();
-		//$contactId = "0035b00002fonLKAAY";
+		//$contactId = current_user()->getContactId();
+		//$contactId = "0035b00002fonLKAAY"; // This is Trevor's Contact Id.
 
-		$service = FileService::fromUser(current_user());
-		$sharing = $service->getSharePoints();
+		$linkedEntityIds = FileService::getUserAssociatedEntityIds();
 
-		array_shift($sharing);
+		$idAssociative = [];
 
+		foreach($linkedEntityIds as $id) {
 
-		// Doing this for now!  Not really sure how Im going to deal with this yet.
-		// Gonna probably want to remove the contact id from the sharing array.  don't need it in the sharing here anymore.
-		// Now just gotta figure out how to not need it in the sharing array in the list function either.
-		$sharing = array_filter($sharing, function($item){
+			$idAssociative[$id] = FileService::getEntityName($id);
+		}
 
-			return $item !== "Me";
-		});
-
+		array_shift($idAssociative);
 
 		$tpl = new Template("form");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		return $tpl->render([
-			"sharing"		=> $sharing,
+			"sharing"		=> $idAssociative,
 			"contactId"		=> $contactId
 		]);
 	}

@@ -3,7 +3,7 @@
 	"name": "file-service",
 	"description": "Upload files as attachments for sObjects.",
 	"connectedApp": "default",
-	"files": ["FileService.php"],
+	"files": ["FileService.php", "UploadedDocument.php"],
 	"components": ["upload", "documents"],
 	"links":[
 		{
