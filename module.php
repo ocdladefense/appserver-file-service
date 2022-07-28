@@ -64,9 +64,7 @@ class FileServiceModule extends Module
 
 		$linkedEntityIds = $this->getRequest()->getBody()->linkedEntityIds;
 
-		$linkedEntityIds = array_filter($linkedEntityIds);
-
-		var_dump($linkedEntityIds);
+		$linkedEntityIds = asarray_filter($linkedEntityIds);
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 
