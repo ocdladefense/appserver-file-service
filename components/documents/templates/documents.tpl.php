@@ -9,7 +9,7 @@
 
     <div class="table">
         <div class="table-row first">
-            <p class="table-header">Shared By</p>
+            <!-- <p class="table-header">Shared By</p> -->
             <p class="table-header">Title</p>
             <p class="table-header">Type</p>
             <p class="table-header">Size</p>
@@ -22,18 +22,6 @@
         <?php foreach($documents as $doc): ?>
             
             <div class="table-row data">
-
-                <?php if(empty($doc->ownerId())) : ?>
-                    <p class="table-cell">
-                        <?php print $doc->uploadedBy(); ?>
-                    </p>
-                <?php else: ?>
-                    <p class="table-cell">
-                        <a href="/directory/members/<?php print $doc->ownerId(); ?>">
-                            <?php print $doc->uploadedBy();?>
-                        </a>
-                    </p>
-                <?php endif; ?>
 
                 <p class="table-cell">
                     <a href="/file/download/<?php print $doc->id(); ?>"><?php print $doc->title(); ?></a>

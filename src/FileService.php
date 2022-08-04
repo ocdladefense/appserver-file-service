@@ -53,7 +53,6 @@ class FileService {
 		if($result->count() == 0) return [];
 
 		$data = $result->group(function($link){ return $link["ContentDocumentId"];});
-		var_dump($data);
 
 		$ids = $result->getField("ContentDocumentId");
 
@@ -64,35 +63,21 @@ class FileService {
 
 		$grouped = $result->group(function($link){ return $link["ContentDocumentId"];});
 
-		
-		var_dump($grouped);exit;
-		// return ContentDocument::fromContentDocumentLinkQueryResult($docs);
-		
-		// The owner data for the documents.  An array of contacts keyed by ContentDocumentIds.
-		// $owners = $this->getOwners($links);
-
-		// Need docs to be an array, not a private row.
-		// $docs = $result->key("ContentDocumentId");
-
 		$docs = array();
 
+		// var_dump($data, $grouped);exit;
 
 		// It all got grouped by ContentDocumentId, above.
 		foreach($grouped as $id => $links) {
-			// These methods will need to be written.
+
 			$doc = new ContentDocument($id);
-			$doc->setDocumentData($data[$id]);
+			// Only need the first element since they all are the same with the exception of the LinkedEntityIds.
+			// We are passing that data in seperatly.
+			$doc->setDocumentData($data[$id][0]["ContentDocument"]);
 			$doc->setLinkedEntities($links);
 			$docs []= $doc;
-			// $doc["ownerName"] = $owners[$id]["Name"];
-			// $doc["ownerId"] = $owners[$id]["Id"];
-
-			// $whoIsTheOwner = $doc->getOwnerId();
 		}
 
-		// Decide whether to display the delete button or the edit button
-
-		
 		return $docs;
 	}
 
