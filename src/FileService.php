@@ -45,10 +45,7 @@ class FileService {
 		$format = "SELECT Id, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileType, ContentDocument.FileExtension, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
 		$query = DbHelper::parseArray($format, $this->linkedEntityIds);
 		$resp = loadApi()->query($query);
-	
 		$result = $resp->getQueryResult();
-
-
 
 		if($result->count() == 0) return [];
 
@@ -65,14 +62,12 @@ class FileService {
 
 		$docs = array();
 
-		// var_dump($data, $grouped);exit;
-
 		// It all got grouped by ContentDocumentId, above.
 		foreach($grouped as $id => $links) {
 
 			$doc = new ContentDocument($id);
-			// Only need the first element since they all are the same with the exception of the LinkedEntityIds.
-			// We are passing that data in seperatly.
+			// Only need the first element since all elements are the same with the exception of the LinkedEntityIds.
+			// We are passing the linked entity data in seperatly.
 			$doc->setDocumentData($data[$id][0]["ContentDocument"]);
 			$doc->setLinkedEntities($links);
 			$docs []= $doc;
@@ -80,23 +75,6 @@ class FileService {
 
 		return $docs;
 	}
-
-
-
-
-
-	// Get all of the ContentDocumentLinks for all of the documents.
-	public function getDocumentLinks($ids) {
-
-		$format = "SELECT ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE ContentDocumentId IN (:array)";
-		$query = DbHelper::parseArray($format, $ids);
-		$links = loadApi()->query($query)->getQueryResult();
-
-		return $links;
-	}
-
-
-
 
 
 
