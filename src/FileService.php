@@ -89,6 +89,22 @@ class FileService {
 	}
 
 
+	public static function getEntityNames($ids) {
+
+		$api = loadApi();
+		$names = [];
+
+		foreach($ids as $id) {
+
+			$type = self::getSobjecttype($id);
+			$query = "SELECT Name FROM $type WHERE Id = '$id'";
+			$names[] = $api->query($query)->getRecord()["Name"];
+		}
+
+		return implode(", ", $names);
+	}
+
+
 	// I think we need a more complete version of this function in core.
 	public static function getSobjectType($id) {
 

@@ -9,7 +9,8 @@
 
     <div class="table">
         <div class="table-row first">
-            <!-- <p class="table-header">Shared By</p> -->
+            <p class="table-header">Uploaded By</p>
+            <p class="table-header">Shared With</p>
             <p class="table-header">Title</p>
             <p class="table-header">Type</p>
             <p class="table-header">Size</p>
@@ -20,8 +21,20 @@
 
 
         <?php foreach($documents as $doc): ?>
+
+            <?php $contactId = current_user()->getContactId(); ?>
             
             <div class="table-row data">
+
+                <p class="table-cell">
+                    <?php $uploadedById = $doc->uploadedById(); ?>
+                    <?php print FileService::getEntityName($uploadedById); ?>
+                </p>
+
+                <p class="table-cell">
+                    <?php $sharedWithIds = $doc->getSharedWithIds(); ?>
+                    <?php print FileService::getEntityNames($sharedWithIds); ?>
+                </p>
 
                 <p class="table-cell">
                     <a href="/file/download/<?php print $doc->id(); ?>"><?php print $doc->title(); ?></a>
@@ -41,7 +54,7 @@
                     </a>
                 </p>
 
-                <?php if($doc->userIsOwner()) : ?>
+                <?php if($doc->isOwner($contactId)) : ?>
                     <p class="table-cell icon-cell">
                         <a href="/file/delete/<?php print $doc->id(); ?>">
                             <i class="fa-solid fa-trash"></i>

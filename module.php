@@ -60,11 +60,13 @@ class FileServiceModule extends Module
 
 
 
-	public function upload(){
+	public function upload() {
 
 		$linkedEntityIds = $this->getRequest()->getBody()->linkedEntityIds;
 
-		$linkedEntityIds = asarray_filter($linkedEntityIds);
+		var_dump($_POST, $this->getRequest()->getBody(),$linkedEntityIds);exit;
+
+		$linkedEntityIds = array_filter($linkedEntityIds);
 
 		$file = $this->getRequest()->getFiles()->getFirst();
 
