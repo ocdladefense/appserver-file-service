@@ -54,6 +54,13 @@ class FileServiceModule extends Module
 			$tables[] = $table;
 		}
 
+	
+
+		// This populates the cache.
+		$cache = FileService::loadDocuments($userAssociated); // may need to use array keys or array values,
+		// depending on what the underlying structure looks like.
+
+
 		return $tpl->render(array("tables" => $tables));
 	}
 

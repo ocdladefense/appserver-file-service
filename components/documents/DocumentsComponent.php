@@ -60,8 +60,7 @@ class DocumentsComponent extends Presentation\Component {
 		return $tpl->render([
 			"documents" 	=> $docs,
 			"title" 		=> $title,
-			"link"			=> $link,
-			"allNames" 		=> $sharedWithNames
+			"link"			=> $link
 		]);
 	}
 

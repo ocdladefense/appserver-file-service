@@ -7,6 +7,10 @@ class FileService {
 
 	private $linkedEntityIds = array();
 
+	// Cache of all documents retrieved for the current request.
+	private static $cache = null;
+
+
 
 	public function __construct($linkedEntityIds = array()) {
 
@@ -36,14 +40,26 @@ class FileService {
 	}
 
 
+	public function getDocuments() {
 
+		// We've already cached all of the documents statically for the current request.
+
+		// Given this instances linkedEntityIds, retrieve documents from the static cache matching those linkedEntityIds.
+
+		// Then return them.
+		$first = $this->linkedEntityIds[0];
+
+		return array_filter(self::$cache, function($doc) use($first) {
+			return in_array($first, $doc->linkedEntities);
+		});
+	}
 
 	// Return an array of "Salesforce\ContentDocument" objects.
-	public function getDocuments() {
+	public static function loadDocuments($linkedEntityIds) {
 
 		// Get the ContentDocumentLinks with all of the ContentDocument data.
 		$format = "SELECT Id, ContentDocument.Title, ContentDocument.ContentSize, ContentDocument.FileType, ContentDocument.FileExtension, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId IN (:array)";
-		$query = DbHelper::parseArray($format, $this->linkedEntityIds);
+		$query = DbHelper::parseArray($format, $linkedEntityIds);
 		$resp = loadApi()->query($query);
 		$result = $resp->getQueryResult();
 
@@ -89,6 +105,8 @@ class FileService {
 				$doc->addSharedWith($sharedWith[$id]);
 			}
 		}
+
+		self::$cache = $docs;
 
 		return $docs;
 	}
