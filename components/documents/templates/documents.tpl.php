@@ -27,8 +27,7 @@
             <div class="table-row data">
 
                 <p class="table-cell">
-                    <?php $uploadedById = $doc->uploadedById(); ?>
-                    <?php print FileService::getEntityName($uploadedById); ?>
+                    <?php print $doc->getUploadedBy(); ?>
                 </p>
 
                 <p class="table-cell">
