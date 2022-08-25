@@ -73,10 +73,53 @@ class FileService {
 			$docs []= $doc;
 		}
 
+
+		// All of the ids of all of the entities linked to all of the documents.
+		$ids = [];
+		foreach($docs as $doc){
+			foreach($doc->getLinkedEntities() as $entityId){
+				if(!in_array($entityId, $ids)) $ids[] = $entityId;
+			}
+		}
+
+		// Associative array of the names of all of the linked entities, keyed by their ids."
+		$sharedWith = $this->getSharedWithNames($ids);
+
+		// If the id of the shared with entity is in the docs linkedEntities array, add the name to the docs "sharedWith" array.
+		foreach($docs as $doc) {
+			foreach($doc->getLinkedEntities() as $id){
+				$doc->addSharedWith($sharedWith[$id]);
+			}
+		}
+
 		return $docs;
 	}
 
 
+	// Build an associative array of entity names, keyed by thier ids.
+	public static function getSharedWithNames($ids) {
+
+		$types = ["Committee__c", "Contact", "Account", "User"];
+
+		$api = loadApi();
+		$records = [];
+		foreach($types as $type) {
+
+			$format = "SELECT Id, Name FROM $type WHERE Id IN (:array)";
+			$query = DbHelper::parseArray($format, $ids);
+			$records[] = $api->query($query)->getRecords();
+		}
+
+		$names = [];
+		foreach($records as $entities) {
+			foreach($entities as $entity) {
+
+				$names[$entity["Id"]] = $entity["Name"];
+			}
+		}
+
+		return $names;
+	}
 
 
 	// I think we need this function in core.

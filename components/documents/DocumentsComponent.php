@@ -1,5 +1,7 @@
 <?php
 
+use Salesforce\ContentDocument;
+
 class DocumentsComponent extends Presentation\Component {
 
 
@@ -58,7 +60,8 @@ class DocumentsComponent extends Presentation\Component {
 		return $tpl->render([
 			"documents" 	=> $docs,
 			"title" 		=> $title,
-			"link"			=> $link
+			"link"			=> $link,
+			"allNames" 		=> $sharedWithNames
 		]);
 	}
 

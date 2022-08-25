@@ -32,8 +32,7 @@
                 </p>
 
                 <p class="table-cell">
-                    <?php $sharedWithIds = $doc->getSharedWithIds(); ?>
-                    <?php print FileService::getEntityNames($sharedWithIds); ?>
+                    <?php print implode(", ", $doc->getSharedWith());?>
                 </p>
 
                 <p class="table-cell">
