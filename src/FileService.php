@@ -58,6 +58,8 @@ class FileService {
 		$query = DbHelper::parseArray($format, $ids);
 		$result = loadApi()->query($query)->getQueryResult();
 
+		$linkedEntityIds = $result->getField("LinkedEntityId");
+
 		$grouped = $result->group(function($link){ return $link["ContentDocumentId"];});
 
 		$docs = array();
@@ -74,19 +76,15 @@ class FileService {
 		}
 
 
-		// All of the ids of all of the entities linked to all of the documents.
-		$ids = [];
-		foreach($docs as $doc){
-			foreach($doc->getLinkedEntities() as $entityId){
-				if(!in_array($entityId, $ids)) $ids[] = $entityId;
-			}
-		}
-
 		// Associative array of the names of all of the linked entities, keyed by their ids."
-		$sharedWith = $this->getSharedWithNames($ids);
+		$sharedWith = self::getSharedWithNames($linkedEntityIds);
 
 		// If the id of the shared with entity is in the docs linkedEntities array, add the name to the docs "sharedWith" array.
 		foreach($docs as $doc) {
+
+			$uploadedById = $doc->getUploadedById();
+			$doc->setUploadedBy($sharedWith[$uploadedById]);
+
 			foreach($doc->getLinkedEntities() as $id){
 				$doc->addSharedWith($sharedWith[$id]);
 			}
@@ -99,22 +97,23 @@ class FileService {
 	// Build an associative array of entity names, keyed by thier ids.
 	public static function getSharedWithNames($ids) {
 
-		$types = ["Committee__c", "Contact", "Account", "User"];
-
-		$api = loadApi();
-		$records = [];
-		foreach($types as $type) {
-
-			$format = "SELECT Id, Name FROM $type WHERE Id IN (:array)";
-			$query = DbHelper::parseArray($format, $ids);
-			$records[] = $api->query($query)->getRecords();
+		$types = [];
+		foreach($ids as $id) {
+			$type = self::getSobjectType($id);
+			if(!in_array($type, $types)) $types[$type][] = $id;
 		}
 
+		$api = loadApi();
 		$names = [];
-		foreach($records as $entities) {
-			foreach($entities as $entity) {
+		foreach($types as $type => $typeIds) {
 
-				$names[$entity["Id"]] = $entity["Name"];
+			$format = "SELECT Id, Name FROM $type WHERE Id IN (:array)";
+			$query = DbHelper::parseArray($format, $typeIds);
+			$results = $api->query($query)->getRecords();
+
+			foreach($results as $result) {
+
+				$names[$result["Id"]] = $result["Name"];
 			}
 		}
 
