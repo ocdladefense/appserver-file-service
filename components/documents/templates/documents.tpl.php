@@ -5,7 +5,11 @@
 ?>
 <div class="doc-list">
 
-<h3 style="display:inline;"><?php print $title; ?></h3> - <a href="<?php print $link; ?>" target="_blank">view on salesforce</a>
+<h3 style="display:inline;"><?php print $title; ?> - </h3>
+
+<?php if(current_user()->isAdmin()) : ?>
+    <a href="<?php print $link; ?>" target="_blank">view on salesforce</a>
+<?php endif; ?>
 
     <div class="table">
         <div class="table-row first">

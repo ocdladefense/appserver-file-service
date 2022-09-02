@@ -29,6 +29,11 @@ class FileServiceModule extends Module
 
 	public function list($entityId = null) {
 
+		$userAssociatedEntities = FileService::getUserAssociatedEntityIds();
+
+		// If the user is not a member of the given entity and is not an admin user, don't try to show them the list of documents.
+		if((null != $entityId && !in_array($entityId, $userAssociatedEntities)) && !current_user()->isAdmin()) return null;
+
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
 
@@ -38,7 +43,7 @@ class FileServiceModule extends Module
 		// If the "entityId" is null, use the ids of all the entities associated with the current user. (ex. committees, accounts).
 		if(null == $entityId) {
 
-			$entityIds = FileService::getUserAssociatedEntityIds();
+			$entityIds = $userAssociatedEntities;
 
 			foreach($entityIds as $entityId) {
 
@@ -162,26 +167,6 @@ class FileServiceModule extends Module
 		else return redirect("/file/list");
 	}
 
-	
-	public function getAttachment($id) {
-
-		// Get the attachment object.
-		$api = loadApi();
-		$results = $api->query("SELECT Id, Name, Body FROM Attachment WHERE Id = '{$id}'");
-		$attachment = $results->getRecord();
-
-		// Request the file content of the attachment using the blobfield endpoint returned in the "Body" field of the attachment.
-		$endpoint = $attachment["Body"];
-		$req = loadApi();
-		$req->removeXHttpClientHeader();
-		$resp = $req->send($endpoint);
-
-		$file = new File($attachment["Name"]);
-		$file->setContent($resp->getBody());
-		$file->setType($resp->getHeader("Content-Type"));
-
-		return $file;
-	}
 
 
 
@@ -281,8 +266,10 @@ class FileServiceModule extends Module
 
 	/////////////////////////	ATTACHMENT STUFF	////////////////////////////////////////////////////////////////////////
 
-		// Get the FileList" object from the request, use the first file to build an "Attachment/File" object,
+	// Get the FileList" object from the request, use the first file to build an "Attachment/File" object,
 	// insert the Attachment, and return the id.
+
+	/**
 	public function insertAttachment($jobId, $file){
 
 		if($jobId == null) throw new Exception("ERROR_ADDING_ATTACHMENT:  The job id can not be null when adding attachments.");
@@ -302,9 +289,10 @@ class FileServiceModule extends Module
 
 		return $attachment->Id;
 	}
+	 */
 
 
-
+	/**
 	public function getAttachments($jobId) {
 
 		$api = loadApi();
@@ -314,4 +302,28 @@ class FileServiceModule extends Module
 		return $attResults->getRecords();
 
 	}
+	 */
+
+
+	/**
+	 public function getAttachment($id) {
+
+		// Get the attachment object.
+		$api = loadApi();
+		$results = $api->query("SELECT Id, Name, Body FROM Attachment WHERE Id = '{$id}'");
+		$attachment = $results->getRecord();
+
+		// Request the file content of the attachment using the blobfield endpoint returned in the "Body" field of the attachment.
+		$endpoint = $attachment["Body"];
+		$req = loadApi();
+		$req->removeXHttpClientHeader();
+		$resp = $req->send($endpoint);
+
+		$file = new File($attachment["Name"]);
+		$file->setContent($resp->getBody());
+		$file->setType($resp->getHeader("Content-Type"));
+
+		return $file;
+	}
+	*/
 }

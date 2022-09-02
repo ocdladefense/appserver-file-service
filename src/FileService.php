@@ -42,6 +42,8 @@ class FileService {
 
 	public function getDocuments() {
 
+		if(empty(self::$cache)) return [];
+
 		// We've already cached all of the documents statically for the current request.
 
 		// Given this instances linkedEntityIds, retrieve documents from the static cache matching those linkedEntityIds.
@@ -187,25 +189,5 @@ class FileService {
 				throw new Exception("NO SOBJECT TYPE FOUND FOR PREFIX $prefix");
 				break;
 		}
-	}
-
-
-	public function downloadContentDocument($id) {
-
-		$api = $this->loadForceApi();
-
-		$query = "SELECT VersionData, Title FROM ContentVersion WHERE ContentDocumentId = '$id' AND IsLatest = True";
-
-		$version = $api->query($query)->getRecord();
-		$versionUrl = $version["VersionData"];
-
-		$api2 = $this->loadForceApi();
-		$resp = $api2->send($versionUrl);
-
-		$file = new File($version["Title"]);
-		$file->setContent($resp->getBody());
-		$file->setType($resp->getHeader("Content-Type"));
-
-		return $file;
 	}
 }
