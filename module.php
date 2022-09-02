@@ -29,18 +29,18 @@ class FileServiceModule extends Module
 
 	public function list($entityId = null) {
 
-		// $webGovId = "a2G5b000000OpoMEAS";
-
 		$tpl = new Template("page");
 		$tpl->addPath(__DIR__ . "/templates");
 
 		$tables = array();
 
+
+		// If the "entityId" is null, use the ids of all the entities associated with the current user. (ex. committees, accounts).
 		if(null == $entityId) {
 
-			$userAssociated = FileService::getUserAssociatedEntityIds();
+			$entityIds = FileService::getUserAssociatedEntityIds();
 
-			foreach($userAssociated as $entityId) {
+			foreach($entityIds as $entityId) {
 
 				$table = [];
 				$table["linkedEntityIds"][] = $entityId;
@@ -49,6 +49,7 @@ class FileServiceModule extends Module
 			
 		} else {
 
+			$entityIds = [$entityId];
 			$table = [];
 			$table["linkedEntityIds"][] = $entityId;
 			$tables[] = $table;
@@ -57,7 +58,7 @@ class FileServiceModule extends Module
 	
 
 		// This populates the cache.
-		$cache = FileService::loadDocuments($userAssociated); // may need to use array keys or array values,
+		$cache = FileService::loadDocuments($entityIds); // may need to use array keys or array values,
 		// depending on what the underlying structure looks like.
 
 
