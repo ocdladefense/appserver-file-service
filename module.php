@@ -305,7 +305,7 @@ class FileServiceModule extends Module
 	 */
 
 
-	/**
+	
 	 public function getAttachment($id) {
 
 		// Get the attachment object.
@@ -325,5 +325,5 @@ class FileServiceModule extends Module
 
 		return $file;
 	}
-	*/
+	
 }
