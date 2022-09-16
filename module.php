@@ -269,7 +269,7 @@ class FileServiceModule extends Module
 	// Get the FileList" object from the request, use the first file to build an "Attachment/File" object,
 	// insert the Attachment, and return the id.
 
-	/**
+	
 	public function insertAttachment($jobId, $file){
 
 		if($jobId == null) throw new Exception("ERROR_ADDING_ATTACHMENT:  The job id can not be null when adding attachments.");
@@ -289,10 +289,10 @@ class FileServiceModule extends Module
 
 		return $attachment->Id;
 	}
-	 */
+	 
 
 
-	/**
+	
 	public function getAttachments($jobId) {
 
 		$api = loadApi();
@@ -302,7 +302,7 @@ class FileServiceModule extends Module
 		return $attResults->getRecords();
 
 	}
-	 */
+
 
 
 	
